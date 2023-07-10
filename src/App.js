@@ -1,14 +1,14 @@
 import "./App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./Pages/Home";
-import Components from "./Pages/Components";
+import StepForm from "./Pages/stepForm";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/components" element={<Components />} />
+        <Route path="/stepForm" element={<StepForm />} />
       </Routes>
     </BrowserRouter>
   );
