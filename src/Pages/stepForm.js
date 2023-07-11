@@ -23,7 +23,7 @@ import {
   setPhotos,
   setSelectedPhoto,
   setUploadedPhoto,
-} from "../../Redux/actions"; // Assuming you have your action creators in a separate file
+} from "../Redux/actions"; // Assuming you have your action creators in a separate file
 
 const useStyles = makeStyles((theme) => ({
   container: {
