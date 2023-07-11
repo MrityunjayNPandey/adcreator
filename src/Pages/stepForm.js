@@ -15,6 +15,16 @@ import {
   CardMedia,
 } from "@material-ui/core";
 
+import { useDispatch, useSelector } from "react-redux";
+import {
+  setProjectName,
+  setDescription,
+  setSelectedCategory,
+  setPhotos,
+  setSelectedPhoto,
+  setUploadedPhoto,
+} from "../../Redux/actions"; // Assuming you have your action creators in a separate file
+
 const useStyles = makeStyles((theme) => ({
   container: {
     maxWidth: 1200,
@@ -88,13 +98,16 @@ const useStyles = makeStyles((theme) => ({
 
 const StepForm = () => {
   const classes = useStyles();
+  const dispatch = useDispatch();
   const [currentStep, setCurrentStep] = useState(1);
-  const [projectName, setProjectName] = useState("");
-  const [description, setDescription] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("");
-  const [photos, setPhotos] = useState([]);
-  const [selectedPhoto, setSelectedPhoto] = useState(null);
-  const [uploadedPhoto, setUploadedPhoto] = useState(null);
+  const {
+    projectName,
+    description,
+    selectedCategory,
+    photos,
+    selectedPhoto,
+    uploadedPhoto,
+  } = useSelector((state) => state);
 
   const API_KEY = "ggFV9hScofwUZWxCLuuW4tphfIJZmgGFKh6k63yrTLp7PVjIKbj9Qd2O";
   const YOUR_SEARCH_QUERY = selectedCategory;
@@ -108,16 +121,16 @@ const StepForm = () => {
             Authorization: API_KEY,
           },
         });
-        setPhotos(response.data.photos);
+        dispatch(setPhotos(response.data.photos));
       } catch (error) {
         console.log(error);
       }
     };
 
-    if (currentStep === 2) {
+    if (YOUR_SEARCH_QUERY) {
       fetchPhotos();
     }
-  }, [currentStep, YOUR_SEARCH_QUERY]);
+  }, [YOUR_SEARCH_QUERY]);
 
   const handleNext = () => {
     setCurrentStep(currentStep + 1);
@@ -136,18 +149,26 @@ const StepForm = () => {
     console.log("Uploaded Photo:", uploadedPhoto);
   };
 
+  const handleProjectNameChange = (e) => {
+    dispatch(setProjectName(e.target.value));
+  };
+
+  const handleDescriptionChange = (e) => {
+    dispatch(setDescription(e.target.value));
+  };
+
   const handleCategoryChange = (event) => {
-    setSelectedCategory(event.target.value);
+    dispatch(setSelectedCategory(event.target.value));
   };
 
   const handlePhotoSelect = (photo) => {
-    setSelectedPhoto(photo);
+    dispatch(setSelectedPhoto(photo));
   };
 
   const handlePhotoUpload = (event) => {
     const file = event.target.files[0];
-    setUploadedPhoto(URL.createObjectURL(file));
-    setSelectedPhoto(null); // Clear selected photo when uploading a new photo
+    dispatch(setUploadedPhoto(URL.createObjectURL(file)));
+    dispatch(setSelectedPhoto(null)); // Clear selected photo when uploading a new photo
   };
 
   const renderStepOne = () => {
@@ -160,14 +181,14 @@ const StepForm = () => {
           type="text"
           label="Project Name"
           value={projectName}
-          onChange={(e) => setProjectName(e.target.value)}
+          onChange={handleProjectNameChange}
         />
         <TextField
           multiline
           rows={4}
           label="Description"
           value={description}
-          onChange={(e) => setDescription(e.target.value)}
+          onChange={handleDescriptionChange}
         />
         <Button
           variant="contained"
