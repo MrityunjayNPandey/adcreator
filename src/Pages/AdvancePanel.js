@@ -21,9 +21,13 @@ export default function AdvancePanel() {
   const [textColor, setTextColor] = useState("");
   const [uploadedImage, setUploadedImage] = useState([]);
   const [images, setImages] = useState([]);
+  const [shapes, setShapes] = useState({
+    square: [],
+    circle: [],
+  });
   const stageRef = useRef(null);
 
-  console.log(images);
+  console.log(shapes);
 
   const handleSaveToImage = () => {
     const uri = stageRef.current.toDataURL();
@@ -75,6 +79,7 @@ export default function AdvancePanel() {
             uploadedImage={uploadedImage}
             setUploadedImage={setUploadedImage}
             setImages={setImages}
+            setShapes={setShapes}
           />
         </Box>
       </Drawer>
@@ -112,6 +117,8 @@ export default function AdvancePanel() {
           images={images}
           setImages={setImages}
           stageRef={stageRef}
+          shapes={shapes}
+          setShapes={setShapes}
         />
       </Box>
     </Box>

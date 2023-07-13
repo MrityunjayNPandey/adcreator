@@ -6,7 +6,7 @@ import MuiAccordionSummary from "@mui/material/AccordionSummary";
 import MuiAccordionDetails from "@mui/material/AccordionDetails";
 import Typography from "@mui/material/Typography";
 import { Box, Button, Grid } from "@mui/material";
-import { backgroundColors, textStyles } from "../Utils/Constants";
+import { backgroundColors, shapesList, textStyles } from "../Utils/Constants";
 import { v4 as uuidv4 } from "uuid";
 
 const Accordion = styled((props) => (
@@ -62,6 +62,7 @@ export default function MenuBar({
   uploadedImage,
   setUploadedImage,
   setImages,
+  setShapes,
 }) {
   const [expanded, setExpanded] = React.useState("panel1");
 
@@ -118,6 +119,18 @@ export default function MenuBar({
       setImages((prev) => [...prev, updatedImage]);
     };
     htmlImage.src = image.src;
+  };
+
+  const handleAddShape = (name) => {
+    const newObj = {
+      id: uuidv4(),
+      type: "shape",
+    };
+
+    setShapes((prevShapes) => ({
+      ...prevShapes,
+      [name]: [...prevShapes[name], newObj],
+    }));
   };
 
   return (
@@ -248,7 +261,29 @@ export default function MenuBar({
         <AccordionSummary aria-controls="panel4d-content" id="panel4d-header">
           <Typography>Shapes</Typography>
         </AccordionSummary>
-        <AccordionDetails></AccordionDetails>
+        <AccordionDetails>
+          <Grid container spacing={4}>
+            {shapesList.map((shape) => (
+              <Grid key={shape.name} item md={6}>
+                <Button
+                  onClick={() => handleAddShape(shape.name)}
+                  sx={{
+                    width: "100%",
+                    minHeight: "20vh",
+                    background: "lightblue",
+                    opacity: 0.3,
+                    borderRadius: shape.radius,
+                    border: "3px solid transparent",
+                    ":hover": {
+                      background: "lightblue",
+                      border: "3px solid #fff",
+                    },
+                  }}
+                ></Button>
+              </Grid>
+            ))}
+          </Grid>
+        </AccordionDetails>
       </Accordion>
     </div>
   );

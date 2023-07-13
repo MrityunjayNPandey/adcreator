@@ -1,6 +1,14 @@
 import React, { useRef, useState } from "react";
 import { Box, Container, TextField } from "@mui/material";
-import { Stage, Layer, Rect, Text, Transformer, Image } from "react-konva";
+import {
+  Stage,
+  Layer,
+  Rect,
+  Text,
+  Transformer,
+  Image,
+  Circle,
+} from "react-konva";
 
 const Canvas = ({
   background,
@@ -14,10 +22,14 @@ const Canvas = ({
   images,
   setImages,
   stageRef,
+  shapes,
+  setShapes,
 }) => {
   const textRefs = useRef({});
   const [selectedImageId, setSelectedImageId] = useState(null);
   const imageRefs = useRef({});
+  const [selectedShapeId, setSelectedShapeId] = useState(null);
+  const shapeRefs = useRef({});
 
   const handleTextDoubleClick = (id) => {
     setTexts((prevTexts) =>
@@ -115,6 +127,8 @@ const Canvas = ({
     });
   };
 
+  const handleShapeTransform = (event, id) => {};
+
   const handleTextClick = (id, item) => {
     setStyle(item.fontStyle);
     setSelectedId(id);
@@ -128,6 +142,7 @@ const Canvas = ({
     setStyle("");
     setTextSize("");
     setTextColor("");
+    setSelectedShapeId(null);
   };
 
   console.log(texts);
@@ -158,6 +173,84 @@ const Canvas = ({
               fill={background}
               onClick={handleStageClick}
             />
+            {shapes.square.map((shape) => (
+              <React.Fragment key={shape.id}>
+                <Rect
+                  width={200}
+                  height={200}
+                  x={100}
+                  y={100}
+                  fill="lightblue"
+                  draggable
+                  onClick={() => setSelectedShapeId(shape.id)}
+                  onTransformEnd={(event) => {
+                    handleShapeTransform(event, shape.id);
+                  }}
+                  ref={(node) => (shapeRefs.current[shape.id] = node)}
+                />
+                {selectedShapeId === shape.id &&
+                  shapeRefs.current[selectedShapeId] && (
+                    <Transformer
+                      node={shapeRefs.current[selectedShapeId]}
+                      rotateEnabled
+                      resizeEnabled
+                      keepRatio={false}
+                    />
+                  )}
+              </React.Fragment>
+            ))}
+            {shapes.circle.map((shape) => (
+              <React.Fragment key={shape.id}>
+                <Circle
+                  width={200}
+                  height={200}
+                  x={100}
+                  y={100}
+                  fill="lightblue"
+                  draggable
+                  onClick={() => setSelectedShapeId(shape.id)}
+                  onTransformEnd={(event) => {
+                    handleShapeTransform(event, shape.id);
+                  }}
+                  ref={(node) => (shapeRefs.current[shape.id] = node)}
+                />
+                {selectedShapeId === shape.id &&
+                  shapeRefs.current[selectedShapeId] && (
+                    <Transformer
+                      node={shapeRefs.current[selectedShapeId]}
+                      rotateEnabled
+                      resizeEnabled
+                      keepRatio={false}
+                    />
+                  )}
+              </React.Fragment>
+            ))}
+            {images.map((image) => (
+              <React.Fragment key={image.id}>
+                <Image
+                  image={image.src}
+                  width={image.width * 0.15}
+                  height={image.height * 0.15}
+                  x={100}
+                  y={100}
+                  draggable
+                  onClick={() => setSelectedImageId(image.id)}
+                  onTransformEnd={(event) =>
+                    handleImageTransform(event, image.id)
+                  }
+                  ref={(node) => (imageRefs.current[image.id] = node)}
+                />
+                {selectedImageId === image.id &&
+                  imageRefs.current[selectedImageId] && (
+                    <Transformer
+                      node={imageRefs.current[selectedImageId]}
+                      rotateEnabled
+                      resizeEnabled
+                      keepRatio={false}
+                    />
+                  )}
+              </React.Fragment>
+            ))}
             {texts.map((text) => (
               <React.Fragment key={text.id}>
                 {!text.isEditing && (
@@ -189,32 +282,6 @@ const Canvas = ({
                     )}
                   </>
                 )}
-              </React.Fragment>
-            ))}
-            {images.map((image) => (
-              <React.Fragment key={image.id}>
-                <Image
-                  image={image.src}
-                  width={image.width * 0.15}
-                  height={image.height * 0.15}
-                  x={100}
-                  y={100}
-                  draggable
-                  onClick={() => setSelectedImageId(image.id)}
-                  onTransformEnd={(event) =>
-                    handleImageTransform(event, image.id)
-                  }
-                  ref={(node) => (imageRefs.current[image.id] = node)}
-                />
-                {selectedImageId === image.id &&
-                  imageRefs.current[selectedImageId] && (
-                    <Transformer
-                      node={imageRefs.current[selectedImageId]}
-                      rotateEnabled
-                      resizeEnabled
-                      keepRatio={false}
-                    />
-                  )}
               </React.Fragment>
             ))}
           </Layer>
