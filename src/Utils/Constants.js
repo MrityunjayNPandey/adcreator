@@ -33,3 +33,14 @@ export const textStyles = [
     font: "Cinzel",
   },
 ];
+
+export const shapesList = [
+  {
+    name: "square",
+    radius: "none",
+  },
+  {
+    name: "circle",
+    radius: "50%",
+  },
+];
