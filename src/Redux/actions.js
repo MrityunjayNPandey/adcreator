@@ -22,8 +22,3 @@ export const setSelectedPhoto = (photo) => ({
   type: "SET_SELECTED_PHOTO",
   payload: photo,
 });
-
-export const setUploadedPhoto = (photo) => ({
-  type: "SET_UPLOADED_PHOTO",
-  payload: photo,
-});

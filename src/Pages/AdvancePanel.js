@@ -9,6 +9,7 @@ import Canvas from "../Components/Canvas";
 import MenuBar from "../Components/MenuBar";
 import EditToolbar from "../Components/EditToolbar";
 import { Button } from "@mui/material";
+import { useSelector } from "react-redux";
 
 const drawerWidth = 350;
 
@@ -28,6 +29,11 @@ export default function AdvancePanel() {
   const stageRef = useRef(null);
 
   console.log(shapes);
+
+  //example of how to use:
+  //contains: id, type, src(base64)
+    const { selectedPhoto } = useSelector((state) => state);
+    console.log("selectedPhoto", selectedPhoto);
 
   const handleSaveToImage = () => {
     const uri = stageRef.current.toDataURL();

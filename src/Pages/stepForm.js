@@ -22,8 +22,10 @@ import {
   setSelectedCategory,
   setPhotos,
   setSelectedPhoto,
-  setUploadedPhoto,
 } from "../Redux/actions"; // Assuming you have your action creators in a separate file
+import { v4 as uuidv4 } from "uuid";
+
+import { useNavigate } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -106,7 +108,6 @@ const StepForm = () => {
     selectedCategory,
     photos,
     selectedPhoto,
-    uploadedPhoto,
   } = useSelector((state) => state);
 
   const API_KEY = "ggFV9hScofwUZWxCLuuW4tphfIJZmgGFKh6k63yrTLp7PVjIKbj9Qd2O";
@@ -121,7 +122,14 @@ const StepForm = () => {
             Authorization: API_KEY,
           },
         });
-        dispatch(setPhotos(response.data.photos));
+        const photos = await Promise.all(
+          response.data.photos.map(async (photo) => ({
+            id: photo.id,
+            type: "image",
+            src: await getBase64FromImageUrl(photo.src.medium),
+          }))
+        );
+        dispatch(setPhotos(photos));
       } catch (error) {
         console.log(error);
       }
@@ -132,6 +140,24 @@ const StepForm = () => {
     }
   }, [YOUR_SEARCH_QUERY]);
 
+  const getBase64FromImageUrl = async (imageUrl) => {
+    try {
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
+      const reader = new FileReader();
+      return new Promise((resolve, reject) => {
+        reader.onloadend = () => {
+          resolve(reader.result);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
+  };
+
   const handleNext = () => {
     setCurrentStep(currentStep + 1);
   };
@@ -139,14 +165,15 @@ const StepForm = () => {
   const handlePrevious = () => {
     setCurrentStep(currentStep - 1);
   };
+  const navigate = useNavigate();
 
   const handleSubmit = () => {
+    navigate("/editor");
     // Handle form submission
     console.log("Project Name:", projectName);
     console.log("Description:", description);
     console.log("Selected Category:", selectedCategory);
     console.log("Selected Photo:", selectedPhoto);
-    console.log("Uploaded Photo:", uploadedPhoto);
   };
 
   const handleProjectNameChange = (e) => {
@@ -167,8 +194,16 @@ const StepForm = () => {
 
   const handlePhotoUpload = (event) => {
     const file = event.target.files[0];
-    dispatch(setUploadedPhoto(URL.createObjectURL(file)));
-    dispatch(setSelectedPhoto(null)); // Clear selected photo when uploading a new photo
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const newItem = {
+        id: uuidv4(),
+        type: "image",
+        src: e.target.result,
+      };
+      dispatch(setSelectedPhoto(newItem));
+    };
+    reader.readAsDataURL(file);
   };
 
   const renderStepOne = () => {
@@ -234,11 +269,7 @@ const StepForm = () => {
                   }`}
                   onClick={() => handlePhotoSelect(photo)}
                 >
-                  <CardMedia
-                    component="img"
-                    src={photo.src.medium}
-                    alt={photo.photographer}
-                  />
+                  <CardMedia component="img" src={photo.src} alt={photo.id} />
                 </Card>
               ))}
             </div>
@@ -270,21 +301,9 @@ const StepForm = () => {
         </Typography>
         {selectedPhoto && (
           <div>
-            <Typography variant="h5">Selected Photo:</Typography>
             <img
-              src={selectedPhoto.src.medium}
-              alt={selectedPhoto.photographer}
-              style={{ maxWidth: 200, maxHeight: 200 }}
-            />
-          </div>
-        )}
-
-        {uploadedPhoto && !selectedPhoto && (
-          <div>
-            <Typography variant="h5">Uploaded Photo:</Typography>
-            <img
-              src={uploadedPhoto}
-              alt="Uploaded"
+              src={selectedPhoto.src}
+              alt={selectedPhoto.id}
               style={{ maxWidth: 200, maxHeight: 200 }}
             />
           </div>
