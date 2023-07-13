@@ -30,11 +30,6 @@ export default function AdvancePanel() {
 
   console.log(shapes);
 
-  //example of how to use:
-  //contains: id, type, src(base64)
-    const { selectedPhoto } = useSelector((state) => state);
-    console.log("selectedPhoto", selectedPhoto);
-
   const handleSaveToImage = () => {
     const uri = stageRef.current.toDataURL();
     console.log(uri);
