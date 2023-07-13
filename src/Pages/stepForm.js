@@ -130,7 +130,7 @@ const StepForm = () => {
     if (YOUR_SEARCH_QUERY) {
       fetchPhotos();
     }
-  }, [API_ENDPOINT, YOUR_SEARCH_QUERY, dispatch]);
+  }, [YOUR_SEARCH_QUERY]);
 
   const handleNext = () => {
     setCurrentStep(currentStep + 1);
