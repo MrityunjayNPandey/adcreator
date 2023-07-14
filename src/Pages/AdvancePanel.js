@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
 import AppBar from "@mui/material/AppBar";
@@ -26,14 +26,34 @@ export default function AdvancePanel() {
     square: [],
     circle: [],
   });
-  const stageRef = useRef(null);  
+  const stageRef = useRef(null);
 
   //example of how to use:
   //contains: id, type, src(base64)
   const { selectedPhoto } = useSelector((state) => state);
   console.log("selectedPhoto", selectedPhoto);
 
-  console.log(shapes);
+  useEffect(() => {
+    if (selectedPhoto) {
+      const image = selectedPhoto;
+      const htmlImage = new Image();
+      htmlImage.onload = () => {
+        const updatedImage = {
+          ...image,
+          src: htmlImage,
+          isSelectedAPI: true,
+          height: htmlImage.height,
+          width: htmlImage.width,
+          x: 0,
+          y: 0,
+        };
+        setImages((prev) => [...prev, updatedImage]);
+      };
+      htmlImage.src = image.src;
+    }
+  }, []);
+
+  console.log(images);
 
   const handleSaveToImage = () => {
     const uri = stageRef.current.toDataURL();
@@ -124,7 +144,6 @@ export default function AdvancePanel() {
           setImages={setImages}
           stageRef={stageRef}
           shapes={shapes}
-          setShapes={setShapes}
         />
       </Box>
     </Box>

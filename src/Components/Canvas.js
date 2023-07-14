@@ -23,7 +23,6 @@ const Canvas = ({
   setImages,
   stageRef,
   shapes,
-  setShapes,
 }) => {
   const textRefs = useRef({});
   const [selectedImageId, setSelectedImageId] = useState(null);
@@ -229,10 +228,12 @@ const Canvas = ({
               <React.Fragment key={image.id}>
                 <Image
                   image={image.src}
-                  width={image.width * 0.15}
-                  height={image.height * 0.15}
-                  x={100}
-                  y={100}
+                  width={image.isSelectedAPI ? image.width : image.width * 0.15}
+                  height={
+                    image.isSelectedAPI ? image.height : image.height * 0.15
+                  }
+                  x={image.x}
+                  y={image.y}
                   draggable
                   onClick={() => setSelectedImageId(image.id)}
                   onTransformEnd={(event) =>

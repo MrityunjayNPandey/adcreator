@@ -10,7 +10,6 @@ import {
   MenuItem,
   FormControl,
   InputLabel,
-  Grid,
   Card,
   CardMedia,
 } from "@material-ui/core";
@@ -101,13 +100,8 @@ const StepForm = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const [currentStep, setCurrentStep] = useState(1);
-  const {
-    projectName,
-    description,
-    selectedCategory,
-    photos,
-    selectedPhoto,
-  } = useSelector((state) => state);
+  const { projectName, description, selectedCategory, photos, selectedPhoto } =
+    useSelector((state) => state);
 
   const API_KEY = "ggFV9hScofwUZWxCLuuW4tphfIJZmgGFKh6k63yrTLp7PVjIKbj9Qd2O";
   const YOUR_SEARCH_QUERY = selectedCategory;
@@ -249,11 +243,20 @@ const StepForm = () => {
             onChange={handleCategoryChange}
           >
             <MenuItem value="">Select a category</MenuItem>
-            <MenuItem value="nature">Nature</MenuItem>
-            <MenuItem value="wildlife">Wildlife</MenuItem>
-            <MenuItem value="art">Art</MenuItem>
-            <MenuItem value="architecture">Architecture</MenuItem>
-            <MenuItem value="food">Food</MenuItem>
+            <MenuItem value="Health and Beauty">Health and Beauty</MenuItem>
+            <MenuItem value="Food and Grocery">Food and Grocery</MenuItem>
+            <MenuItem value="Entertainment and Activities">
+              Entertainment and Activities
+            </MenuItem>
+            <MenuItem value="Toys, Kids and Baby">Toys, Kids and Baby</MenuItem>
+            <MenuItem value="Clothing and Jewellery">
+              Clothing and Jewellery
+            </MenuItem>
+            <MenuItem value="Electronics">Electronics</MenuItem>
+            <MenuItem value="Books, Coaching and Classes">
+              Books, Coaching and Classes
+            </MenuItem>
+            <MenuItem value="Home and Furniture">Home and Furniture</MenuItem>
           </Select>
         </FormControl>
         {photos.length > 0 && (

@@ -115,6 +115,8 @@ export default function MenuBar({
         src: htmlImage,
         height: htmlImage.height,
         width: htmlImage.width,
+        x: 100,
+        y: 100,
       };
       setImages((prev) => [...prev, updatedImage]);
     };
