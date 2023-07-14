@@ -24,6 +24,7 @@ import {
 } from "../Redux/actions"; // Assuming you have your action creators in a separate file
 import { v4 as uuidv4 } from "uuid";
 import { useNavigate } from "react-router-dom";
+import Loader from "react-loader";
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -107,26 +108,31 @@ const StepForm = () => {
   const YOUR_SEARCH_QUERY = selectedCategory;
   const API_ENDPOINT = `https://api.pexels.com/v1/search?query=${YOUR_SEARCH_QUERY}&per_page=10`;
 
+  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
     const fetchPhotos = async () => {
-      try {
-        const response = await axios.get(API_ENDPOINT, {
-          headers: {
-            Authorization: API_KEY,
-          },
-        });
-        const photos = await Promise.all(
-          response.data.photos.map(async (photo) => ({
-            id: photo.id,
-            type: "image",
-            src: await getBase64FromImageUrl(photo.src.medium),
-          }))
-        );
-        dispatch(setPhotos(photos));
-      } catch (error) {
-        console.log(error);
-      }
-    };
+        try {
+          setLoading(true);
+          const response = await axios.get(API_ENDPOINT, {
+            headers: {
+              Authorization: API_KEY,
+            },
+          });
+          const photos = await Promise.all(
+            response.data.photos.map(async (photo) => ({
+              id: photo.id,
+              type: "image",
+              src: await getBase64FromImageUrl(photo.src.medium),
+            }))
+          );
+          dispatch(setPhotos(photos));
+          setLoading(false);
+        } catch (error) {
+          console.log(error);
+          setLoading(false);
+        }
+      };
 
     if (YOUR_SEARCH_QUERY) {
       fetchPhotos();
@@ -259,6 +265,7 @@ const StepForm = () => {
             <MenuItem value="Home and Furniture">Home and Furniture</MenuItem>
           </Select>
         </FormControl>
+        <Loader loaded={!loading} lines={13} length={20} width={10} radius={30} color="#000" />
         {photos.length > 0 && (
           <>
             <Typography variant="h5">Choose an image:</Typography>
