@@ -61,7 +61,6 @@ export default function AdvancePanel() {
   const handleSaveToImage = () => {
     const uri = stageRef.current.toDataURL();
     dispatch(setFinalPhoto(uri));
-    console.log(uri);
     navigate("/finalpanel");
   };
 

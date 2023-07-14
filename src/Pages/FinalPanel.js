@@ -1,8 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import { makeStyles } from "@material-ui/core";
-import { useSelector } from "react-redux";
 import { Typography } from "@material-ui/core";
 import { Button, Container } from "@mui/material";
+import { useDispatch, useSelector } from "react-redux";
+import { setFinalPhoto } from "../Redux/actions";
+
 const useStyles = makeStyles((theme) => ({
   container: {
     maxWidth: 1200,
@@ -78,24 +80,68 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+const compressImage = (imageDataUrl, maxSizeInBytes) => {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.src = imageDataUrl;
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+
+      const maxDimension = Math.max(img.width, img.height);
+      const scaleFactor = maxDimension > 1200 ? 1200 / maxDimension : 1;
+
+      canvas.width = img.width * scaleFactor;
+      canvas.height = img.height * scaleFactor;
+
+      ctx.drawImage(
+        img,
+        0,
+        0,
+        img.width,
+        img.height,
+        0,
+        0,
+        canvas.width,
+        canvas.height
+      );
+
+      const compressedDataUrl = canvas.toDataURL("image/jpeg", 0.8); // Adjust the compression quality as needed
+      resolve(compressedDataUrl);
+    };
+    img.onerror = (error) => reject(error);
+  });
+};
+
 const FinalPanel = () => {
   const classes = useStyles();
   const { finalPhoto } = useSelector((state) => state);
-  console.log("finalPhoto", finalPhoto);
+  //   console.log("finalPhoto", finalPhoto);
 
   const handleDownload = () => {
-    // Create a temporary link element
     const link = document.createElement("a");
     link.href = finalPhoto;
     link.download = "finalImage.jpg"; // Set the desired file name
     link.target = "_blank";
-
-    // Simulate a click to start the download
     document.body.appendChild(link);
     link.click();
-
-    // Clean up the temporary link element
     document.body.removeChild(link);
+  };
+
+  const dispatch = useDispatch();
+
+  const handleSave = async () => {
+    const imageFile = finalPhoto;
+    const maxSizeInBytes = 1; // Bytes
+    console.log(imageFile.length);
+    if (imageFile.length > maxSizeInBytes) {
+      const compressedImageDataURL = await compressImage(
+        imageFile,
+        maxSizeInBytes
+      );
+      dispatch(setFinalPhoto(compressedImageDataURL));
+      console.log(compressedImageDataURL.length);
+    }
   };
 
   return (
@@ -113,18 +159,21 @@ const FinalPanel = () => {
             />
           </div>
         )}
-        {finalPhoto && (
-          <div>
-            <Button
-              variant="contained"
-              color="primary"
-              className={classes.downloadButton}
-              onClick={handleDownload}
-            >
-              Download
-            </Button>
-          </div>
-        )}
+        <Button
+          variant="contained"
+          className={classes.redButton}
+          onClick={handleDownload}
+        >
+          Download
+        </Button>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleSave}
+          className={classes.blueButton}
+        >
+          Save
+        </Button>
       </form>
     </Container>
   );
