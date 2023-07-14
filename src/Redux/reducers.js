@@ -34,6 +34,11 @@ const rootReducer = (state = initialState, action) => {
         ...state,
         selectedPhoto: action.payload,
       };
+    case "SET_FINAL_PHOTO":
+      return {
+        ...state,
+        finalPhoto: action.payload,
+      };
     default:
       return state;
   }

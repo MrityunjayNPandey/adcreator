@@ -9,8 +9,9 @@ import Canvas from "../Components/Canvas";
 import MenuBar from "../Components/MenuBar";
 import EditToolbar from "../Components/EditToolbar";
 import { Button } from "@mui/material";
-import { useSelector } from "react-redux";
-
+import { useDispatch, useSelector } from "react-redux";
+import { setFinalPhoto } from "../Redux/actions";
+import { useNavigate } from "react-router-dom";
 const drawerWidth = 350;
 
 export default function AdvancePanel() {
@@ -54,10 +55,14 @@ export default function AdvancePanel() {
   }, []);
 
   console.log(images);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const handleSaveToImage = () => {
     const uri = stageRef.current.toDataURL();
+    dispatch(setFinalPhoto(uri));
     console.log(uri);
+    navigate("/finalpanel");
   };
 
   return (

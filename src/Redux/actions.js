@@ -22,3 +22,8 @@ export const setSelectedPhoto = (photo) => ({
   type: "SET_SELECTED_PHOTO",
   payload: photo,
 });
+
+export const setFinalPhoto = (photo) => ({
+  type: "SET_FINAL_PHOTO",
+  payload: photo,
+});

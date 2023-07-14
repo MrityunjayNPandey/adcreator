@@ -112,27 +112,27 @@ const StepForm = () => {
 
   useEffect(() => {
     const fetchPhotos = async () => {
-        try {
-          setLoading(true);
-          const response = await axios.get(API_ENDPOINT, {
-            headers: {
-              Authorization: API_KEY,
-            },
-          });
-          const photos = await Promise.all(
-            response.data.photos.map(async (photo) => ({
-              id: photo.id,
-              type: "image",
-              src: await getBase64FromImageUrl(photo.src.medium),
-            }))
-          );
-          dispatch(setPhotos(photos));
-          setLoading(false);
-        } catch (error) {
-          console.log(error);
-          setLoading(false);
-        }
-      };
+      try {
+        setLoading(true);
+        const response = await axios.get(API_ENDPOINT, {
+          headers: {
+            Authorization: API_KEY,
+          },
+        });
+        const photos = await Promise.all(
+          response.data.photos.map(async (photo) => ({
+            id: photo.id,
+            type: "image",
+            src: await getBase64FromImageUrl(photo.src.large),
+          }))
+        );
+        dispatch(setPhotos(photos));
+        setLoading(false);
+      } catch (error) {
+        console.log(error);
+        setLoading(false);
+      }
+    };
 
     if (YOUR_SEARCH_QUERY) {
       fetchPhotos();
@@ -265,7 +265,14 @@ const StepForm = () => {
             <MenuItem value="Home and Furniture">Home and Furniture</MenuItem>
           </Select>
         </FormControl>
-        <Loader loaded={!loading} lines={13} length={20} width={10} radius={30} color="#000" />
+        <Loader
+          loaded={!loading}
+          lines={13}
+          length={20}
+          width={10}
+          radius={30}
+          color="#000"
+        />
         {photos.length > 0 && (
           <>
             <Typography variant="h5">Choose an image:</Typography>
@@ -313,7 +320,7 @@ const StepForm = () => {
             <img
               src={selectedPhoto.src}
               alt={selectedPhoto.id}
-              style={{ maxWidth: 200, maxHeight: 200 }}
+              style={{ maxWidth: 600, maxHeight: 600 }}
             />
           </div>
         )}
