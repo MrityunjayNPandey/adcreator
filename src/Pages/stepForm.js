@@ -340,7 +340,7 @@ const StepForm = () => {
           onClick={handleSubmit}
           className={classes.blueButton}
         >
-          Submit
+          Edit in Editor
         </Button>
       </form>
     );
