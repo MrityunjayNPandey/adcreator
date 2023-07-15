@@ -320,7 +320,7 @@ const StepForm = () => {
             <img
               src={selectedPhoto.src}
               alt={selectedPhoto.id}
-              style={{ maxWidth: 600, maxHeight: 600 }}
+              style={{ maxWidth: 500, maxHeight: 500 }}
             />
           </div>
         )}

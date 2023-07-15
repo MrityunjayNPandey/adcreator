@@ -115,7 +115,6 @@ const compressImage = (imageDataUrl, maxSizeInBytes) => {
 const FinalPanel = () => {
   const classes = useStyles();
   const { finalPhoto } = useSelector((state) => state);
-  //   console.log("finalPhoto", finalPhoto);
 
   const handleDownload = () => {
     const link = document.createElement("a");
@@ -158,13 +157,13 @@ const FinalPanel = () => {
             />
           </div>
         )}
-        <Button
+        {/* <Button
           variant="contained"
           className={classes.redButton}
           onClick={handleDownload}
         >
           Download
-        </Button>
+        </Button> */}
         <Button
           variant="contained"
           color="primary"
