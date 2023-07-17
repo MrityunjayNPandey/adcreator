@@ -1,5 +1,5 @@
-import React, { useRef, useState } from "react";
-import { Box, Container, TextField } from "@mui/material";
+import React, { useRef, useState, memo } from "react";
+import { Box, Button, Container, TextField } from "@mui/material";
 import {
   Stage,
   Layer,
@@ -23,11 +23,12 @@ const Canvas = ({
   setImages,
   stageRef,
   shapes,
+  selectedObjId,
+  setSelectedObjId,
+  setShapes,
 }) => {
   const textRefs = useRef({});
-  const [selectedImageId, setSelectedImageId] = useState(null);
   const imageRefs = useRef({});
-  const [selectedShapeId, setSelectedShapeId] = useState(null);
   const shapeRefs = useRef({});
 
   const handleTextDoubleClick = (id) => {
@@ -108,6 +109,20 @@ const Canvas = ({
     );
   };
 
+  const handleImageZIndex = (id) => {
+    setImages((prevImages) => {
+      const image = prevImages.find((img) => img.id === id);
+      const index = prevImages.indexOf(image);
+      if (index > -1) {
+        const updatedImages = [...prevImages];
+        updatedImages.splice(index, 1);
+        updatedImages.push(image);
+        return updatedImages;
+      }
+      return prevImages;
+    });
+  };
+
   const handleImageTransform = (event, id) => {
     setImages((prevImages) => {
       return prevImages.map((image) => {
@@ -128,6 +143,11 @@ const Canvas = ({
 
   const handleShapeTransform = (event, id) => {};
 
+  const handleRemoveBackground = (id) => {
+    const imageFromCanvas = images.find((img) => img.id === id);
+    console.log(imageFromCanvas);
+  };
+
   const handleTextClick = (id, item) => {
     setStyle(item.fontStyle);
     setSelectedId(id);
@@ -137,11 +157,11 @@ const Canvas = ({
 
   const handleStageClick = () => {
     setSelectedId(null);
-    setSelectedImageId(null);
+    setSelectedObjId(null);
     setStyle("");
     setTextSize("");
     setTextColor("");
-    setSelectedShapeId(null);
+    //setSelectedShapeId(null);
   };
 
   console.log(texts);
@@ -172,51 +192,41 @@ const Canvas = ({
               fill={background}
               onClick={handleStageClick}
             />
-            {shapes.square.map((shape) => (
+            {shapes.map((shape) => (
               <React.Fragment key={shape.id}>
-                <Rect
-                  width={200}
-                  height={200}
-                  x={100}
-                  y={100}
-                  fill="lightblue"
-                  draggable
-                  onClick={() => setSelectedShapeId(shape.id)}
-                  onTransformEnd={(event) => {
-                    handleShapeTransform(event, shape.id);
-                  }}
-                  ref={(node) => (shapeRefs.current[shape.id] = node)}
-                />
-                {selectedShapeId === shape.id &&
-                  shapeRefs.current[selectedShapeId] && (
+                {shape.type === "square" ? (
+                  <Rect
+                    width={200}
+                    height={200}
+                    x={100}
+                    y={100}
+                    fill="lightblue"
+                    draggable
+                    onClick={() => setSelectedObjId(shape.id)}
+                    onTransformEnd={(event) => {
+                      handleShapeTransform(event, shape.id);
+                    }}
+                    ref={(node) => (shapeRefs.current[shape.id] = node)}
+                  />
+                ) : (
+                  <Circle
+                    width={200}
+                    height={200}
+                    x={100}
+                    y={100}
+                    fill="lightblue"
+                    draggable
+                    onClick={() => setSelectedObjId(shape.id)}
+                    onTransformEnd={(event) => {
+                      handleShapeTransform(event, shape.id);
+                    }}
+                    ref={(node) => (shapeRefs.current[shape.id] = node)}
+                  />
+                )}
+                {selectedObjId === shape.id &&
+                  shapeRefs.current[selectedObjId] && (
                     <Transformer
-                      node={shapeRefs.current[selectedShapeId]}
-                      rotateEnabled
-                      resizeEnabled
-                      keepRatio={false}
-                    />
-                  )}
-              </React.Fragment>
-            ))}
-            {shapes.circle.map((shape) => (
-              <React.Fragment key={shape.id}>
-                <Circle
-                  width={200}
-                  height={200}
-                  x={100}
-                  y={100}
-                  fill="lightblue"
-                  draggable
-                  onClick={() => setSelectedShapeId(shape.id)}
-                  onTransformEnd={(event) => {
-                    handleShapeTransform(event, shape.id);
-                  }}
-                  ref={(node) => (shapeRefs.current[shape.id] = node)}
-                />
-                {selectedShapeId === shape.id &&
-                  shapeRefs.current[selectedShapeId] && (
-                    <Transformer
-                      node={shapeRefs.current[selectedShapeId]}
+                      node={shapeRefs.current[selectedObjId]}
                       rotateEnabled
                       resizeEnabled
                       keepRatio={false}
@@ -228,23 +238,22 @@ const Canvas = ({
               <React.Fragment key={image.id}>
                 <Image
                   image={image.src}
-                  width={image.isSelectedAPI ? image.width : image.width * 0.15}
-                  height={
-                    image.isSelectedAPI ? image.height : image.height * 0.15
-                  }
+                  width={image.width}
+                  height={image.height}
                   x={image.x}
                   y={image.y}
                   draggable
-                  onClick={() => setSelectedImageId(image.id)}
+                  onDragStart={() => handleImageZIndex(image.id)}
+                  onClick={() => setSelectedObjId(image.id)}
                   onTransformEnd={(event) =>
                     handleImageTransform(event, image.id)
                   }
                   ref={(node) => (imageRefs.current[image.id] = node)}
                 />
-                {selectedImageId === image.id &&
-                  imageRefs.current[selectedImageId] && (
+                {selectedObjId === image.id &&
+                  imageRefs.current[selectedObjId] && (
                     <Transformer
-                      node={imageRefs.current[selectedImageId]}
+                      node={imageRefs.current[selectedObjId]}
                       rotateEnabled
                       resizeEnabled
                       keepRatio={false}
@@ -318,8 +327,11 @@ const Canvas = ({
           </React.Fragment>
         ))}
       </Box>
+      <Button onClick={() => handleRemoveBackground(selectedObjId)}>
+        remove bg
+      </Button>
     </Container>
   );
 };
 
-export default Canvas;
+export default memo(Canvas);

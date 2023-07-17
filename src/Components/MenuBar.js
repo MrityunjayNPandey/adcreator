@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { memo } from "react";
 import { styled } from "@mui/material/styles";
 import ArrowForwardIosSharpIcon from "@mui/icons-material/ArrowForwardIosSharp";
 import MuiAccordion from "@mui/material/Accordion";
@@ -6,7 +6,13 @@ import MuiAccordionSummary from "@mui/material/AccordionSummary";
 import MuiAccordionDetails from "@mui/material/AccordionDetails";
 import Typography from "@mui/material/Typography";
 import { Box, Button, Grid } from "@mui/material";
-import { backgroundColors, shapesList, textStyles } from "../Utils/Constants";
+import {
+  backgroundColors,
+  iconsList,
+  shapesList,
+  templateList,
+  textStyles,
+} from "../Utils/Constants";
 import { v4 as uuidv4 } from "uuid";
 
 const Accordion = styled((props) => (
@@ -56,7 +62,7 @@ const AccordionDetails = styled(MuiAccordionDetails)(({ theme }) => ({
   background: "#484848",
 }));
 
-export default function MenuBar({
+function MenuBar({
   setBackground,
   setTexts,
   uploadedImage,
@@ -74,20 +80,20 @@ export default function MenuBar({
     setBackground(color);
   };
 
-  const addTextToCanvas = (font) => {
+  const addTextToCanvas = (font, color, val) => {
     setTexts((prev) => [
       ...prev,
       {
         id: uuidv4(),
         type: "text",
-        val: "Hello",
+        val: val,
         x: 100,
         y: 100,
         isDragging: false,
         isEditing: false,
         fontStyle: font,
-        size: 25,
-        color: "black",
+        size: 40,
+        color: color,
       },
     ]);
   };
@@ -106,33 +112,43 @@ export default function MenuBar({
     reader.readAsDataURL(file);
   };
 
-  const AddImageToCanvas = (id) => {
-    const image = uploadedImage.find((item) => item.id === id);
+  const addingItemsToCanvas = (src, type, size, pos) => {
     const htmlImage = new Image();
     htmlImage.onload = () => {
       const updatedImage = {
-        ...image,
+        id: uuidv4(),
+        type: type,
         src: htmlImage,
-        height: htmlImage.height,
-        width: htmlImage.width,
-        x: 100,
-        y: 100,
+        height: type === "template" ? 500 : htmlImage.height * size,
+        width: type === "template" ? 500 : htmlImage.width * size,
+        x: pos,
+        y: pos,
       };
       setImages((prev) => [...prev, updatedImage]);
     };
-    htmlImage.src = image.src;
+    htmlImage.src = src;
+  };
+
+  const AddImageToCanvas = (id) => {
+    const image = uploadedImage.find((item) => item.id === id);
+    addingItemsToCanvas(image.src, "image", 0.3, 100);
+  };
+
+  const AddIconToCanvas = (src) => {
+    addingItemsToCanvas(src, "icon", 0.3, 100);
+  };
+
+  const AddTemplateToCanvas = (src) => {
+    addingItemsToCanvas(src, "template", 1, 0);
   };
 
   const handleAddShape = (name) => {
     const newObj = {
       id: uuidv4(),
-      type: "shape",
+      type: name,
     };
 
-    setShapes((prevShapes) => ({
-      ...prevShapes,
-      [name]: [...prevShapes[name], newObj],
-    }));
+    setShapes((prevShapes) => [...prevShapes, newObj]);
   };
 
   return (
@@ -178,12 +194,17 @@ export default function MenuBar({
               <Grid item md={6} key={index}>
                 <Button
                   sx={{ width: "100%", height: "20vh" }}
-                  onClick={() => addTextToCanvas(item.font)}
+                  onClick={() =>
+                    addTextToCanvas(item.font, item.color, item.val)
+                  }
                 >
                   <img
                     src={item.img}
                     alt="text"
-                    style={{ width: "100%", filter: "invert(100%)" }}
+                    style={{
+                      width: "100%",
+                      filter: item.color === "#000" ? "invert(100%)" : "none",
+                    }}
                   />
                 </Button>
               </Grid>
@@ -196,7 +217,7 @@ export default function MenuBar({
         onChange={handleChange("panel3")}
       >
         <AccordionSummary aria-controls="panel3d-content" id="panel3d-header">
-          <Typography>Upload Image</Typography>
+          <Typography>Uploads</Typography>
         </AccordionSummary>
         <AccordionDetails>
           <Box>
@@ -246,7 +267,7 @@ export default function MenuBar({
                   >
                     <img
                       src={image.src}
-                      alt="image"
+                      alt="uploadedImage"
                       style={{ width: "100%" }}
                     />
                   </Button>
@@ -287,6 +308,56 @@ export default function MenuBar({
           </Grid>
         </AccordionDetails>
       </Accordion>
+      <Accordion
+        expanded={expanded === "panel5"}
+        onChange={handleChange("panel5")}
+      >
+        <AccordionSummary aria-controls="panel5d-content" id="panel5d-header">
+          <Typography>Icons</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          <Grid container spacing={1}>
+            {iconsList.map((icon, index) => (
+              <Grid item md={3} key={index}>
+                <Button
+                  sx={{ width: "100%" }}
+                  onClick={() => AddIconToCanvas(icon.src)}
+                >
+                  <img src={icon.src} alt="icon" style={{ width: "100%" }} />
+                </Button>
+              </Grid>
+            ))}
+          </Grid>
+        </AccordionDetails>
+      </Accordion>
+      <Accordion
+        expanded={expanded === "panel6"}
+        onChange={handleChange("panel6")}
+      >
+        <AccordionSummary aria-controls="panel6d-content" id="panel6d-header">
+          <Typography>Templates</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          <Grid container spacing={1}>
+            {templateList.map((template, index) => (
+              <Grid item md={6} key={index}>
+                <Button
+                  sx={{ width: "100%" }}
+                  onClick={() => AddTemplateToCanvas(template.src)}
+                >
+                  <img
+                    src={template.src}
+                    alt="template"
+                    style={{ width: "100%" }}
+                  />
+                </Button>
+              </Grid>
+            ))}
+          </Grid>
+        </AccordionDetails>
+      </Accordion>
     </div>
   );
 }
+
+export default memo(MenuBar);

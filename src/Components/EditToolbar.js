@@ -6,8 +6,9 @@ import {
   MenuItem,
   Select,
 } from "@mui/material";
-import React from "react";
+import React, { memo } from "react";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { textStyles } from "../Utils/Constants";
 
 const EditToolbar = ({
   selectedId,
@@ -18,6 +19,9 @@ const EditToolbar = ({
   textSize,
   setTextColor,
   textColor,
+  selectedObjId,
+  setImages,
+  setShapes,
 }) => {
   const handleStyleChange = (event) => {
     setStyle(event.target.value);
@@ -65,7 +69,20 @@ const EditToolbar = ({
   };
 
   const handleDeleteItem = () => {
-    setTexts((prevTexts) => prevTexts.filter((text) => text.id !== selectedId));
+    if (selectedId) {
+      setTexts((prevTexts) =>
+        prevTexts.filter((text) => text.id !== selectedId)
+      );
+    }
+
+    if (selectedObjId) {
+      setImages((prevImages) =>
+        prevImages.filter((image) => image.id !== selectedObjId)
+      );
+      setShapes((prevShapes) =>
+        prevShapes.filter((shape) => shape.id !== selectedObjId)
+      );
+    }
   };
 
   return (
@@ -96,10 +113,11 @@ const EditToolbar = ({
               ".MuiOutlinedInput-notchedOutline": { borderColor: "#fff" },
             }}
           >
-            <MenuItem value="Bilbo Swash Caps">Bilbo Swash Caps</MenuItem>
-            <MenuItem value="Rock Salt">Rock Salt</MenuItem>
-            <MenuItem value="Anton">Anton</MenuItem>
-            <MenuItem value="Cinzel">Cinzel</MenuItem>
+            {textStyles.map((style, index) => (
+              <MenuItem key={index} value={style.font}>
+                {style.font}
+              </MenuItem>
+            ))}
           </Select>
         </FormControl>
         <FormControl sx={{ m: 1, minWidth: 80 }} size="small">
@@ -160,4 +178,4 @@ const EditToolbar = ({
   );
 };
 
-export default EditToolbar;
+export default memo(EditToolbar);

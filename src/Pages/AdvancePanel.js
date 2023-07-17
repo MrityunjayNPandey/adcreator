@@ -18,15 +18,13 @@ export default function AdvancePanel() {
   const [background, setBackground] = useState("white");
   const [texts, setTexts] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
+  const [selectedObjId, setSelectedObjId] = useState(null);
   const [style, setStyle] = useState("");
   const [textSize, setTextSize] = useState("");
   const [textColor, setTextColor] = useState("");
   const [uploadedImage, setUploadedImage] = useState([]);
   const [images, setImages] = useState([]);
-  const [shapes, setShapes] = useState({
-    square: [],
-    circle: [],
-  });
+  const [shapes, setShapes] = useState([]);
   const stageRef = useRef(null);
 
   //example of how to use:
@@ -52,9 +50,9 @@ export default function AdvancePanel() {
       };
       htmlImage.src = image.src;
     }
-  }, []);
+  }, [selectedPhoto]);
 
-  console.log(images);
+  console.log(shapes);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -134,6 +132,9 @@ export default function AdvancePanel() {
           textSize={textSize}
           setTextColor={setTextColor}
           textColor={textColor}
+          selectedObjId={selectedObjId}
+          setImages={setImages}
+          setShapes={setShapes}
         />
         <Canvas
           background={background}
@@ -148,6 +149,9 @@ export default function AdvancePanel() {
           setImages={setImages}
           stageRef={stageRef}
           shapes={shapes}
+          selectedObjId={selectedObjId}
+          setSelectedObjId={setSelectedObjId}
+          setShapes={setShapes}
         />
       </Box>
     </Box>
