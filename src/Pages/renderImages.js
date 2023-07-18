@@ -11,6 +11,7 @@ import {
   InputLabel,
   Card,
   CardMedia,
+  TextField,
 } from "@material-ui/core";
 
 import { useDispatch, useSelector } from "react-redux";
@@ -166,10 +167,16 @@ const RenderImages = () => {
     <Container className={classes.container}>
       <form className={classes.form}>
         <Typography variant="h4" gutterBottom>
-          Select Category
+          Search Images
         </Typography>
+        <TextField
+          type="text"
+          label="Search Category"
+          value={selectedCategory}
+          onChange={handleCategoryChange}
+        />
         <FormControl className={classes.select}>
-          <InputLabel id="category-label">Category</InputLabel>
+          <InputLabel id="category-label">Our Suggestions</InputLabel>
           <Select
             labelId="category-label"
             value={selectedCategory}

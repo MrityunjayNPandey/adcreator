@@ -1,7 +1,7 @@
 const initialState = {
   projectName: "",
   description: "",
-  selectedCategory: "",
+  selectedCategory: "random", // Set the default value to "curated"
   photos: [],
   selectedPhoto: null,
   uploadedPhoto: null,
