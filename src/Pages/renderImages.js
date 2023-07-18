@@ -19,7 +19,7 @@ import {
   setSelectedCategory,
   setPhotos,
   setSelectedPhoto,
-} from "../Redux/actions"; // Assuming you have your action creators in a separate file
+} from "../Redux/actions"; 
 import { useNavigate } from "react-router-dom";
 import Loader from "react-loader";
 
@@ -102,8 +102,11 @@ const RenderImages = () => {
   );
 
   const API_KEY = "ggFV9hScofwUZWxCLuuW4tphfIJZmgGFKh6k63yrTLp7PVjIKbj9Qd2O";
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const PER_PAGE = 10;
   const YOUR_SEARCH_QUERY = selectedCategory;
-  const API_ENDPOINT = `https://api.pexels.com/v1/search?query=${YOUR_SEARCH_QUERY}&per_page=10`;
+  const API_ENDPOINT = `https://api.pexels.com/v1/search?query=${YOUR_SEARCH_QUERY}&per_page=${PER_PAGE}&page=${currentPage}`;
 
   const [loading, setLoading] = useState(false);
 
@@ -116,6 +119,9 @@ const RenderImages = () => {
             Authorization: API_KEY,
           },
         });
+        const totalResults = response.data.total_results;
+        const totalPages = Math.ceil(totalResults / PER_PAGE);
+        setTotalPages(totalPages);
         const photos = await Promise.all(
           response.data.photos.map(async (photo) => ({
             id: photo.id,
@@ -153,6 +159,7 @@ const RenderImages = () => {
       return null;
     }
   };
+
   const navigate = useNavigate();
 
   const handleCategoryChange = (event) => {
@@ -163,6 +170,10 @@ const RenderImages = () => {
     dispatch(setSelectedPhoto(photo));
   };
 
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+  };
+
   return (
     <Container className={classes.container}>
       <form className={classes.form}>
@@ -171,7 +182,7 @@ const RenderImages = () => {
         </Typography>
         <TextField
           type="text"
-          label="Search Category"
+          label="Search Images"
           value={selectedCategory}
           onChange={handleCategoryChange}
         />
@@ -182,7 +193,7 @@ const RenderImages = () => {
             value={selectedCategory}
             onChange={handleCategoryChange}
           >
-            <MenuItem value="">Select a category</MenuItem>
+            <MenuItem value="">Select a Suggestion</MenuItem>
             <MenuItem value="Health and Beauty">Health and Beauty</MenuItem>
             <MenuItem value="Food and Grocery">Food and Grocery</MenuItem>
             <MenuItem value="Entertainment and Activities">
@@ -224,6 +235,22 @@ const RenderImages = () => {
               ))}
             </div>
           </>
+        )}
+        {totalPages > 1 && (
+          <div>
+            <Button
+              disabled={currentPage === 1}
+              onClick={() => handlePageChange(currentPage - 1)}
+            >
+              Previous
+            </Button>
+            <Button
+              disabled={currentPage === totalPages}
+              onClick={() => handlePageChange(currentPage + 1)}
+            >
+              Next
+            </Button>
+          </div>
         )}
         <Button
           variant="contained"
