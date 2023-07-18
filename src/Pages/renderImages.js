@@ -115,33 +115,41 @@ const RenderImages = () => {
 
   useEffect(() => {
     const fetchPhotos = async () => {
-      console.log(API_ENDPOINT);
-      setLoading(true);
-      const response = await axios.get(API_ENDPOINT, {
-        headers: {
-          Authorization: API_KEY,
-        },
-      });
-      const newPhotos = await Promise.all(
-        response.data.photos.map(async (photo) => ({
-          id: photo.id,
-          type: "image",
-          src: await getBase64FromImageUrl(photo.src.large),
-        }))
-      );
-      const updatedPhotos = [...photos, ...newPhotos];
-      dispatch(setPhotos([...photos, ...newPhotos]));
-      const totalResults = updatedPhotos.length;
-      const totalPages = Math.ceil(totalResults / PER_PAGE);
-      setTotalPages(totalPages);
-      setLoading(false);
+      try {
+        setLoading(true);
+        const response = await axios.get(API_ENDPOINT, {
+          headers: {
+            Authorization: API_KEY,
+          },
+        });
+        const newPhotos = await Promise.all(
+          response.data.photos.map(async (photo) => ({
+            id: photo.id,
+            type: "image",
+            src: await getBase64FromImageUrl(photo.src.large),
+          }))
+        );
+        const updatedPhotos = [...photos, ...newPhotos];
+        dispatch(setPhotos(updatedPhotos));
+        const totalResults = updatedPhotos.length;
+        const totalPages = Math.ceil(totalResults / PER_PAGE);
+        setTotalPages(totalPages);
+        setLoading(false);
+      } catch (error) {
+        console.log(error);
+        setLoading(false);
+      }
     };
 
-    if (currentPage === totalPages && YOUR_SEARCH_QUERY) {
-      const nextPage = fetchedPage + 1;
-      setFetchedPage(nextPage);
-      fetchPhotos();
-    }
+    const fetchData = async () => {
+      if (currentPage === totalPages && YOUR_SEARCH_QUERY) {
+        const nextPage = fetchedPage + 1;
+        setFetchedPage(nextPage);
+        await fetchPhotos();
+      }
+    };
+    fetchData();
+    
   }, [YOUR_SEARCH_QUERY, currentPage]);
 
   const getBase64FromImageUrl = async (imageUrl) => {
