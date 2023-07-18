@@ -106,7 +106,7 @@ const RenderImages = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [fetchedPage, setFetchedPage] = useState(1);
   const PER_PAGE = 10;
-  const INIT_FETCH = 2 * PER_PAGE;
+  const INIT_FETCH = 10 * PER_PAGE;
 
   const YOUR_SEARCH_QUERY = selectedCategory;
   const API_ENDPOINT = `https://api.pexels.com/v1/search?query=${YOUR_SEARCH_QUERY}&per_page=${INIT_FETCH}&page=${fetchedPage}`;

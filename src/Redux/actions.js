@@ -1,6 +1,6 @@
-export const setProjectName = (name) => ({
-  type: "SET_PROJECT_NAME",
-  payload: name,
+export const setSelectedCategory = (category) => ({
+  type: "SET_SELECTED_CATEGORY",
+  payload: category,
 });
 
 export const setPhotos = (photos) => ({
