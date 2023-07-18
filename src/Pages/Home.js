@@ -27,7 +27,7 @@ const Home = () => {
   const navigate = useNavigate();
 
   const handleButtonClick = () => {
-    navigate("/stepform"); // Replace '/stepform' with the actual path of the desired destination
+    navigate("/choose");
   };
 
   return (

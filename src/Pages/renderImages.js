@@ -4,7 +4,6 @@ import { makeStyles } from "@material-ui/core/styles";
 import {
   Container,
   Typography,
-  TextField,
   Button,
   Select,
   MenuItem,
@@ -16,13 +15,10 @@ import {
 
 import { useDispatch, useSelector } from "react-redux";
 import {
-  setProjectName,
-  setDescription,
   setSelectedCategory,
   setPhotos,
   setSelectedPhoto,
 } from "../Redux/actions"; // Assuming you have your action creators in a separate file
-import { v4 as uuidv4 } from "uuid";
 import { useNavigate } from "react-router-dom";
 import Loader from "react-loader";
 
@@ -97,12 +93,12 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const StepForm = () => {
+const RenderImages = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
-  const [currentStep, setCurrentStep] = useState(1);
-  const { projectName, description, selectedCategory, photos, selectedPhoto } =
-    useSelector((state) => state);
+  const { selectedCategory, photos, selectedPhoto } = useSelector(
+    (state) => state
+  );
 
   const API_KEY = "ggFV9hScofwUZWxCLuuW4tphfIJZmgGFKh6k63yrTLp7PVjIKbj9Qd2O";
   const YOUR_SEARCH_QUERY = selectedCategory;
@@ -137,7 +133,7 @@ const StepForm = () => {
     if (YOUR_SEARCH_QUERY) {
       fetchPhotos();
     }
-  }, [YOUR_SEARCH_QUERY]);
+  }, [API_ENDPOINT, YOUR_SEARCH_QUERY, dispatch]);
 
   const getBase64FromImageUrl = async (imageUrl) => {
     try {
@@ -156,32 +152,7 @@ const StepForm = () => {
       return null;
     }
   };
-
-  const handleNext = () => {
-    setCurrentStep(currentStep + 1);
-  };
-
-  const handlePrevious = () => {
-    setCurrentStep(currentStep - 1);
-  };
   const navigate = useNavigate();
-
-  const handleSubmit = () => {
-    navigate("/editor");
-    // Handle form submission
-    console.log("Project Name:", projectName);
-    console.log("Description:", description);
-    console.log("Selected Category:", selectedCategory);
-    console.log("Selected Photo:", selectedPhoto);
-  };
-
-  const handleProjectNameChange = (e) => {
-    dispatch(setProjectName(e.target.value));
-  };
-
-  const handleDescriptionChange = (e) => {
-    dispatch(setDescription(e.target.value));
-  };
 
   const handleCategoryChange = (event) => {
     dispatch(setSelectedCategory(event.target.value));
@@ -191,55 +162,11 @@ const StepForm = () => {
     dispatch(setSelectedPhoto(photo));
   };
 
-  const handlePhotoUpload = (event) => {
-    const file = event.target.files[0];
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const newItem = {
-        id: uuidv4(),
-        type: "image",
-        src: e.target.result,
-      };
-      dispatch(setSelectedPhoto(newItem));
-    };
-    reader.readAsDataURL(file);
-  };
-
-  const renderStepOne = () => {
-    return (
+  return (
+    <Container className={classes.container}>
       <form className={classes.form}>
         <Typography variant="h4" gutterBottom>
-          Step 1: Project Details
-        </Typography>
-        <TextField
-          type="text"
-          label="Project Name"
-          value={projectName}
-          onChange={handleProjectNameChange}
-        />
-        <TextField
-          multiline
-          rows={4}
-          label="Description"
-          value={description}
-          onChange={handleDescriptionChange}
-        />
-        <Button
-          variant="contained"
-          className={classes.blueButton}
-          onClick={handleNext}
-        >
-          Next
-        </Button>
-      </form>
-    );
-  };
-
-  const renderStepTwo = () => {
-    return (
-      <form className={classes.form}>
-        <Typography variant="h4" gutterBottom>
-          Step 2: Select Category
+          Select Category
         </Typography>
         <FormControl className={classes.select}>
           <InputLabel id="category-label">Category</InputLabel>
@@ -293,66 +220,16 @@ const StepForm = () => {
         )}
         <Button
           variant="contained"
-          className={classes.redButton}
-          onClick={handlePrevious}
-        >
-          Previous
-        </Button>
-        <Button
-          variant="contained"
           className={classes.blueButton}
-          onClick={handleNext}
+          onClick={() => {
+            navigate("/preview");
+          }}
         >
-          Next
+          Preview
         </Button>
       </form>
-    );
-  };
-
-  const renderStepThree = () => {
-    return (
-      <form className={classes.form}>
-        <Typography variant="h4" gutterBottom>
-          Step 3: Image Preview and Submission
-        </Typography>
-        {selectedPhoto && (
-          <div>
-            <img
-              src={selectedPhoto.src}
-              alt={selectedPhoto.id}
-              style={{ maxWidth: 500, maxHeight: 500 }}
-            />
-          </div>
-        )}
-
-        <input type="file" accept="image/*" onChange={handlePhotoUpload} />
-
-        <Button
-          variant="contained"
-          className={classes.redButton}
-          onClick={handlePrevious}
-        >
-          Previous
-        </Button>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={handleSubmit}
-          className={classes.blueButton}
-        >
-          Edit in Editor
-        </Button>
-      </form>
-    );
-  };
-
-  return (
-    <Container className={classes.container}>
-      {currentStep === 1 && renderStepOne()}
-      {currentStep === 2 && renderStepTwo()}
-      {currentStep === 3 && renderStepThree()}
     </Container>
   );
 };
 
-export default StepForm;
+export default RenderImages;
