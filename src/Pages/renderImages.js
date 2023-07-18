@@ -19,7 +19,7 @@ import {
   setSelectedCategory,
   setPhotos,
   setSelectedPhoto,
-} from "../Redux/actions"; 
+} from "../Redux/actions";
 import { useNavigate } from "react-router-dom";
 import Loader from "react-loader";
 
@@ -104,43 +104,45 @@ const RenderImages = () => {
   const API_KEY = "ggFV9hScofwUZWxCLuuW4tphfIJZmgGFKh6k63yrTLp7PVjIKbj9Qd2O";
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [fetchedPage, setFetchedPage] = useState(1);
   const PER_PAGE = 10;
+  const INIT_FETCH = 2 * PER_PAGE;
+
   const YOUR_SEARCH_QUERY = selectedCategory;
-  const API_ENDPOINT = `https://api.pexels.com/v1/search?query=${YOUR_SEARCH_QUERY}&per_page=${PER_PAGE}&page=${currentPage}`;
+  const API_ENDPOINT = `https://api.pexels.com/v1/search?query=${YOUR_SEARCH_QUERY}&per_page=${INIT_FETCH}&page=${fetchedPage}`;
 
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchPhotos = async () => {
-      try {
-        setLoading(true);
-        const response = await axios.get(API_ENDPOINT, {
-          headers: {
-            Authorization: API_KEY,
-          },
-        });
-        const totalResults = response.data.total_results;
-        const totalPages = Math.ceil(totalResults / PER_PAGE);
-        setTotalPages(totalPages);
-        const photos = await Promise.all(
-          response.data.photos.map(async (photo) => ({
-            id: photo.id,
-            type: "image",
-            src: await getBase64FromImageUrl(photo.src.large),
-          }))
-        );
-        dispatch(setPhotos(photos));
-        setLoading(false);
-      } catch (error) {
-        console.log(error);
-        setLoading(false);
-      }
+      console.log(API_ENDPOINT);
+      setLoading(true);
+      const response = await axios.get(API_ENDPOINT, {
+        headers: {
+          Authorization: API_KEY,
+        },
+      });
+      const newPhotos = await Promise.all(
+        response.data.photos.map(async (photo) => ({
+          id: photo.id,
+          type: "image",
+          src: await getBase64FromImageUrl(photo.src.large),
+        }))
+      );
+      const updatedPhotos = [...photos, ...newPhotos];
+      dispatch(setPhotos([...photos, ...newPhotos]));
+      const totalResults = updatedPhotos.length;
+      const totalPages = Math.ceil(totalResults / PER_PAGE);
+      setTotalPages(totalPages);
+      setLoading(false);
     };
 
-    if (YOUR_SEARCH_QUERY) {
+    if (currentPage === totalPages && YOUR_SEARCH_QUERY) {
+      const nextPage = fetchedPage + 1;
+      setFetchedPage(nextPage);
       fetchPhotos();
     }
-  }, [API_ENDPOINT, YOUR_SEARCH_QUERY, dispatch]);
+  }, [YOUR_SEARCH_QUERY, currentPage]);
 
   const getBase64FromImageUrl = async (imageUrl) => {
     try {
@@ -163,6 +165,10 @@ const RenderImages = () => {
   const navigate = useNavigate();
 
   const handleCategoryChange = (event) => {
+    dispatch(setPhotos([]));
+    setFetchedPage(1);
+    setCurrentPage(1);
+    setTotalPages(1);
     dispatch(setSelectedCategory(event.target.value));
   };
 
@@ -173,6 +179,11 @@ const RenderImages = () => {
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
   };
+
+  const paginatedPhotos = photos.slice(
+    (currentPage - 1) * PER_PAGE,
+    currentPage * PER_PAGE
+  );
 
   return (
     <Container className={classes.container}>
@@ -193,7 +204,9 @@ const RenderImages = () => {
             value={selectedCategory}
             onChange={handleCategoryChange}
           >
-            <MenuItem value="">Select a Suggestion</MenuItem>
+            <MenuItem value="Random" selected>
+              Select a Suggestion
+            </MenuItem>
             <MenuItem value="Health and Beauty">Health and Beauty</MenuItem>
             <MenuItem value="Food and Grocery">Food and Grocery</MenuItem>
             <MenuItem value="Entertainment and Activities">
@@ -222,7 +235,7 @@ const RenderImages = () => {
           <>
             <Typography variant="h5">Choose an image:</Typography>
             <div className={classes.mediaContainer}>
-              {photos.map((photo) => (
+              {paginatedPhotos.map((photo) => (
                 <Card
                   key={photo.id}
                   className={`${classes.card} ${
@@ -245,7 +258,7 @@ const RenderImages = () => {
               Previous
             </Button>
             <Button
-              disabled={currentPage === totalPages}
+              disabled={currentPage >= totalPages}
               onClick={() => handlePageChange(currentPage + 1)}
             >
               Next

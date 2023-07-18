@@ -1,7 +1,5 @@
 const initialState = {
-  projectName: "",
-  description: "",
-  selectedCategory: "random", // Set the default value to "curated"
+  selectedCategory: "Random",
   photos: [],
   selectedPhoto: null,
   uploadedPhoto: null,
@@ -9,16 +7,6 @@ const initialState = {
 
 const rootReducer = (state = initialState, action) => {
   switch (action.type) {
-    case "SET_PROJECT_NAME":
-      return {
-        ...state,
-        projectName: action.payload,
-      };
-    case "SET_DESCRIPTION":
-      return {
-        ...state,
-        description: action.payload,
-      };
     case "SET_SELECTED_CATEGORY":
       return {
         ...state,
