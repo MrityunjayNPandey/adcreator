@@ -101,7 +101,10 @@ const RenderImages = () => {
     (state) => state
   );
 
-  const API_KEY = "ggFV9hScofwUZWxCLuuW4tphfIJZmgGFKh6k63yrTLp7PVjIKbj9Qd2O";
+  const API_KEY_PEXEL =
+    "ggFV9hScofwUZWxCLuuW4tphfIJZmgGFKh6k63yrTLp7PVjIKbj9Qd2O";
+  const API_KEY_UNSPLASH = "IEKwy9pi9HGWBmT1vDbHNTpHp7J41vfAHmb0F0_m5Do";
+
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [fetchedPage, setFetchedPage] = useState(1);
@@ -109,7 +112,8 @@ const RenderImages = () => {
   const INIT_FETCH = 10 * PER_PAGE;
 
   const YOUR_SEARCH_QUERY = selectedCategory;
-  const API_ENDPOINT = `https://api.pexels.com/v1/search?query=${YOUR_SEARCH_QUERY}&per_page=${INIT_FETCH}&page=${fetchedPage}`;
+  const API_ENDPOINT_PEXEL = `https://api.pexels.com/v1/search?query=${YOUR_SEARCH_QUERY}&per_page=${INIT_FETCH}&page=${fetchedPage}`;
+  const API_ENDPOINT_UNSPLASH = `https://api.unsplash.com/search/photos/?client_id=${API_KEY_UNSPLASH}`;
 
   const [loading, setLoading] = useState(false);
 
@@ -117,19 +121,39 @@ const RenderImages = () => {
     const fetchPhotos = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(API_ENDPOINT, {
+        const responsePexel = await axios.get(API_ENDPOINT_PEXEL, {
           headers: {
-            Authorization: API_KEY,
+            Authorization: API_KEY_PEXEL,
           },
         });
-        const newPhotos = await Promise.all(
-          response.data.photos.map(async (photo) => ({
+        const responseUnsplash = await axios.get(API_ENDPOINT_UNSPLASH, {
+          params: {
+            query: YOUR_SEARCH_QUERY,
+            page: fetchedPage,
+            per_page: INIT_FETCH, // Number of results per page
+          },
+        });
+        const newPhotosPexel = await Promise.all(
+          responsePexel.data.photos.map(async (photo) => ({
             id: photo.id,
             type: "image",
             src: await getBase64FromImageUrl(photo.src.large),
           }))
         );
-        const updatedPhotos = [...photos, ...newPhotos];
+        console.log(newPhotosPexel);
+        const newPhotosUnsplash = await Promise.all(
+          responseUnsplash.data.results.map(async (photo) => ({
+            id: photo.id,
+            type: "image",
+            src: await getBase64FromImageUrl(photo.urls.regular),
+          }))
+        );
+        console.log(newPhotosUnsplash);
+        const updatedPhotos = [
+          ...photos,
+          ...newPhotosPexel,
+          ...newPhotosUnsplash,
+        ];
         dispatch(setPhotos(updatedPhotos));
         const totalResults = updatedPhotos.length;
         const totalPages = Math.ceil(totalResults / PER_PAGE);
@@ -149,7 +173,6 @@ const RenderImages = () => {
       }
     };
     fetchData();
-    
   }, [YOUR_SEARCH_QUERY, currentPage]);
 
   const getBase64FromImageUrl = async (imageUrl) => {
