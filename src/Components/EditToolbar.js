@@ -1,5 +1,6 @@
 import {
   Box,
+  Button,
   FormControl,
   IconButton,
   InputLabel,
@@ -9,6 +10,7 @@ import {
 import React, { memo } from "react";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { textStyles } from "../Utils/Constants";
+import axios from "axios";
 
 const EditToolbar = ({
   selectedId,
@@ -22,6 +24,7 @@ const EditToolbar = ({
   selectedObjId,
   setImages,
   setShapes,
+  images,
 }) => {
   const handleStyleChange = (event) => {
     setStyle(event.target.value);
@@ -83,6 +86,12 @@ const EditToolbar = ({
         prevShapes.filter((shape) => shape.id !== selectedObjId)
       );
     }
+  };
+
+  const handleRemoveBackground = async () => {
+    const image = images.find((img) => img.id === selectedObjId);
+    const dataUri = image.src;
+    console.log(dataUri);
   };
 
   return (
@@ -170,8 +179,11 @@ const EditToolbar = ({
         </FormControl>
       </Box>
       <Box>
+        <Button variant="contained" onClick={handleRemoveBackground}>
+          Remove Background
+        </Button>
         <IconButton onClick={handleDeleteItem}>
-          <DeleteIcon sx={{ color: "#fff" }} />
+          <DeleteIcon sx={{ color: "#fff", ml: 2 }} />
         </IconButton>
       </Box>
     </Box>

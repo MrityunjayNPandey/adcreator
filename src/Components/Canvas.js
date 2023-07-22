@@ -143,11 +143,6 @@ const Canvas = ({
 
   const handleShapeTransform = (event, id) => {};
 
-  const handleRemoveBackground = (id) => {
-    const imageFromCanvas = images.find((img) => img.id === id);
-    console.log(imageFromCanvas);
-  };
-
   const handleTextClick = (id, item) => {
     setStyle(item.fontStyle);
     setSelectedId(id);
@@ -327,9 +322,6 @@ const Canvas = ({
           </React.Fragment>
         ))}
       </Box>
-      <Button onClick={() => handleRemoveBackground(selectedObjId)}>
-        remove bg
-      </Button>
     </Container>
   );
 };

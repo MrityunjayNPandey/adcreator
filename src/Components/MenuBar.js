@@ -124,6 +124,7 @@ function MenuBar({
         x: pos,
         y: pos,
       };
+      htmlImage.classList.add("canvas-image");
       setImages((prev) => [...prev, updatedImage]);
     };
     htmlImage.src = src;

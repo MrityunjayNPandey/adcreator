@@ -46,6 +46,7 @@ export default function AdvancePanel() {
           x: 0,
           y: 0,
         };
+        htmlImage.classList.add("canvas-image");
         setImages((prev) => [...prev, updatedImage]);
       };
       htmlImage.src = image.src;
@@ -135,6 +136,7 @@ export default function AdvancePanel() {
           selectedObjId={selectedObjId}
           setImages={setImages}
           setShapes={setShapes}
+          images={images}
         />
         <Canvas
           background={background}
