@@ -1,11 +1,18 @@
-import React, { memo } from "react";
+import React, { memo, useEffect, useState } from "react";
 import { styled } from "@mui/material/styles";
 import ArrowForwardIosSharpIcon from "@mui/icons-material/ArrowForwardIosSharp";
 import MuiAccordion from "@mui/material/Accordion";
 import MuiAccordionSummary from "@mui/material/AccordionSummary";
 import MuiAccordionDetails from "@mui/material/AccordionDetails";
 import Typography from "@mui/material/Typography";
-import { Box, Button, Grid } from "@mui/material";
+import {
+  Box,
+  Button,
+  Grid,
+  TextField,
+  InputAdornment,
+  CircularProgress,
+} from "@mui/material";
 import {
   backgroundColors,
   iconsList,
@@ -14,6 +21,8 @@ import {
   textStyles,
 } from "../Utils/Constants";
 import { v4 as uuidv4 } from "uuid";
+import SearchIcon from "@mui/icons-material/Search";
+import { createClient } from "pexels";
 
 const Accordion = styled((props) => (
   <MuiAccordion disableGutters elevation={0} square {...props} />
@@ -71,6 +80,74 @@ function MenuBar({
   setShapes,
 }) {
   const [expanded, setExpanded] = React.useState("panel1");
+  const [pexelPhotos, setPexelPhotos] = useState([]);
+  const [query, setQuery] = useState("random");
+  const [loading, setLoading] = useState(false);
+  const client = createClient(
+    "ggFV9hScofwUZWxCLuuW4tphfIJZmgGFKh6k63yrTLp7PVjIKbj9Qd2O"
+  );
+
+  useEffect(() => {
+    console.log(query);
+    const fetchImages = () => {
+      setLoading(true);
+      client.photos
+        .search({ query, per_page: 100 })
+        .then((res) => {
+          const photos = res.photos;
+
+          const fetchedImages = photos.map((photo) => {
+            const imageUrl = photo.src.original;
+            const imageId = photo.id;
+            return {
+              id: imageId,
+              src: imageUrl,
+            };
+          });
+          console.log(photos);
+          setPexelPhotos(fetchedImages);
+          setLoading(false);
+        })
+        .catch((error) => {
+          console.log(error);
+          setLoading(false);
+        });
+    };
+
+    fetchImages();
+  }, [query]);
+
+  const debounce = (func, delay) => {
+    let timerId;
+    return function (...args) {
+      clearTimeout(timerId);
+      timerId = setTimeout(() => func.apply(this, args), delay);
+    };
+  };
+
+  const handleQueryChange = (e) => {
+    setQuery(e.target.value);
+  };
+
+  const debouncedHandleQueryChange = debounce(handleQueryChange, 500);
+
+  const getBase64FromImageUrl = async (imageUrl) => {
+    try {
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
+      const reader = new FileReader();
+      return new Promise((resolve, reject) => {
+        reader.onloadend = () => {
+          resolve(reader.result);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
+  };
 
   const handleChange = (panel) => (event, newExpanded) => {
     setExpanded(newExpanded ? panel : false);
@@ -143,6 +220,17 @@ function MenuBar({
     addingItemsToCanvas(src, "template", 1, 0);
   };
 
+  const AddPhotoToCanvas = async (id, src) => {
+    try {
+      const convertedSrc = await getBase64FromImageUrl(src);
+      if (convertedSrc) {
+        addingItemsToCanvas(convertedSrc, "photo", 0.1, 100);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const handleAddShape = (name) => {
     const newObj = {
       id: uuidv4(),
@@ -211,6 +299,84 @@ function MenuBar({
               </Grid>
             ))}
           </Grid>
+        </AccordionDetails>
+      </Accordion>
+      <Accordion
+        expanded={expanded === "panel7"}
+        onChange={handleChange("panel7")}
+      >
+        <AccordionSummary aria-controls="panel7d-content" id="panel7d-header">
+          <Typography>Photos</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          <TextField
+            variant="standard"
+            defaultValue={query}
+            onChange={debouncedHandleQueryChange}
+            placeholder="Search..."
+            sx={{
+              width: "100%",
+              background: "#27272A",
+              mb: 2,
+              padding: "0px 5px",
+              input: {
+                color: "#fff",
+              },
+            }}
+            InputProps={{
+              disableUnderline: true,
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon sx={{ color: "#fff" }} />
+                </InputAdornment>
+              ),
+            }}
+          />
+          <Typography sx={{ textAlign: "center", mb: 2 }}>
+            Photos by Pexel
+          </Typography>
+          {loading ? (
+            <Box sx={{ textAlign: "center" }}>
+              <CircularProgress sx={{ color: "#fff" }} />
+            </Box>
+          ) : (
+            <Grid container spacing={1}>
+              <Grid item md={6}>
+                {pexelPhotos.slice(0, 15).map((photo) => (
+                  <Button
+                    onClick={() => AddPhotoToCanvas(photo.id, photo.src)}
+                    disableRipple
+                    sx={{ width: "100%", padding: 0, mb: 1 }}
+                  >
+                    <img
+                      key={photo.id}
+                      src={photo.src}
+                      alt="photo"
+                      style={{ width: "100%", borderRadius: "5px" }}
+                      loading="lazy"
+                    />
+                  </Button>
+                ))}
+              </Grid>
+              <Grid item md={6}>
+                {pexelPhotos.slice(16, 30).map((photo) => (
+                  <Button
+                    onClick={() => AddPhotoToCanvas(photo.id, photo.src)}
+                    disableRipple
+                    sx={{ width: "100%", padding: 0, mb: 1 }}
+                  >
+                    <img
+                      key={photo.id}
+                      src={photo.src}
+                      alt="photo"
+                      style={{ width: "100%", borderRadius: "5px" }}
+                      loading="lazy"
+                    />
+                  </Button>
+                ))}
+              </Grid>
+            </Grid>
+          )}
         </AccordionDetails>
       </Accordion>
       <Accordion

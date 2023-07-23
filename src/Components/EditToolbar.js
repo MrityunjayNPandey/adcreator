@@ -11,6 +11,7 @@ import React, { memo } from "react";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { textStyles } from "../Utils/Constants";
 import axios from "axios";
+import ColorPicker from "./ColorPicker";
 
 const EditToolbar = ({
   selectedId,
@@ -56,14 +57,14 @@ const EditToolbar = ({
     );
   };
 
-  const handleColorChange = (event) => {
-    setTextColor(event.target.value);
+  const handleColorChange = (color) => {
+    setTextColor(color.hex);
     setTexts((prevTexts) =>
       prevTexts.map((text) => {
         if (text.id === selectedId) {
           return {
             ...text,
-            color: event.target.value,
+            color: color.hex,
           };
         }
         return text;
@@ -90,7 +91,7 @@ const EditToolbar = ({
 
   const handleRemoveBackground = async () => {
     const image = images.find((img) => img.id === selectedObjId);
-    const dataUri = image.src;
+    const dataUri = image?.src;
     console.log(dataUri);
   };
 
@@ -103,59 +104,58 @@ const EditToolbar = ({
         width: "60%",
         display: "flex",
         alignItems: "center",
-        justifyContent: "space-between",
+        justifyContent: "space-around",
       }}
     >
-      <Box>
-        <FormControl sx={{ m: 1, minWidth: 80 }} size="small">
-          <InputLabel id="styleLabel" sx={{ color: "#fff" }}>
-            Style
-          </InputLabel>
-          <Select
-            labelId="styleSelect"
-            id="styleSelect"
-            value={style}
-            label="style"
-            onChange={handleStyleChange}
-            sx={{
-              color: "#fff",
-              ".MuiOutlinedInput-notchedOutline": { borderColor: "#fff" },
-            }}
-          >
-            {textStyles.map((style, index) => (
-              <MenuItem key={index} value={style.font}>
-                {style.font}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-        <FormControl sx={{ m: 1, minWidth: 80 }} size="small">
-          <InputLabel id="demo-select-small-label" sx={{ color: "#fff" }}>
-            Size
-          </InputLabel>
-          <Select
-            labelId="demo-select-small-label"
-            id="demo-select-small"
-            value={textSize}
-            label="Age"
-            onChange={handleSizeChange}
-            sx={{
-              color: "#fff",
-              ".MuiOutlinedInput-notchedOutline": { borderColor: "#fff" },
-            }}
-          >
-            <MenuItem value={10}>10</MenuItem>
-            <MenuItem value={15}>15</MenuItem>
-            <MenuItem value={20}>20</MenuItem>
-            <MenuItem value={25}>25</MenuItem>
-            <MenuItem value={30}>30</MenuItem>
-            <MenuItem value={35}>35</MenuItem>
-            <MenuItem value={40}>40</MenuItem>
-            <MenuItem value={45}>45</MenuItem>
-            <MenuItem value={50}>50</MenuItem>
-          </Select>
-        </FormControl>
-        <FormControl sx={{ m: 1, minWidth: 80 }} size="small">
+      <FormControl sx={{ m: 1, minWidth: 80 }} size="small">
+        <InputLabel id="styleLabel" sx={{ color: "#fff" }}>
+          Style
+        </InputLabel>
+        <Select
+          labelId="styleSelect"
+          id="styleSelect"
+          value={style}
+          label="style"
+          onChange={handleStyleChange}
+          sx={{
+            color: "#fff",
+            ".MuiOutlinedInput-notchedOutline": { borderColor: "#fff" },
+          }}
+        >
+          {textStyles.map((style, index) => (
+            <MenuItem key={index} value={style.font}>
+              {style.font}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+      <FormControl sx={{ m: 1, minWidth: 80 }} size="small">
+        <InputLabel id="demo-select-small-label" sx={{ color: "#fff" }}>
+          Size
+        </InputLabel>
+        <Select
+          labelId="demo-select-small-label"
+          id="demo-select-small"
+          value={textSize}
+          label="Age"
+          onChange={handleSizeChange}
+          sx={{
+            color: "#fff",
+            ".MuiOutlinedInput-notchedOutline": { borderColor: "#fff" },
+          }}
+        >
+          <MenuItem value={10}>10</MenuItem>
+          <MenuItem value={15}>15</MenuItem>
+          <MenuItem value={20}>20</MenuItem>
+          <MenuItem value={25}>25</MenuItem>
+          <MenuItem value={30}>30</MenuItem>
+          <MenuItem value={35}>35</MenuItem>
+          <MenuItem value={40}>40</MenuItem>
+          <MenuItem value={45}>45</MenuItem>
+          <MenuItem value={50}>50</MenuItem>
+        </Select>
+      </FormControl>
+      {/* <FormControl sx={{ m: 1, minWidth: 80 }} size="small">
           <InputLabel id="demo-select-small-label" sx={{ color: "#fff" }}>
             Color
           </InputLabel>
@@ -176,16 +176,17 @@ const EditToolbar = ({
             <MenuItem value="blue">Blue</MenuItem>
             <MenuItem value="black">black</MenuItem>
           </Select>
-        </FormControl>
-      </Box>
-      <Box>
-        <Button variant="contained" onClick={handleRemoveBackground}>
-          Remove Background
-        </Button>
-        <IconButton onClick={handleDeleteItem}>
-          <DeleteIcon sx={{ color: "#fff", ml: 2 }} />
-        </IconButton>
-      </Box>
+        </FormControl> */}
+      <ColorPicker
+        textColor={textColor}
+        handleColorChange={handleColorChange}
+      />
+      <Button variant="contained" onClick={handleRemoveBackground}>
+        Remove Background
+      </Button>
+      <IconButton onClick={handleDeleteItem}>
+        <DeleteIcon sx={{ color: "#fff", ml: 2 }} />
+      </IconButton>
     </Box>
   );
 };
