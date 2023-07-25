@@ -1,5 +1,5 @@
-import React, { useRef, useState, memo } from "react";
-import { Box, Button, Container, TextField } from "@mui/material";
+import React, { useRef, memo } from "react";
+import { Box, Container, TextField } from "@mui/material";
 import {
   Stage,
   Layer,
@@ -7,7 +7,7 @@ import {
   Text,
   Transformer,
   Image,
-  Circle,
+  Shape,
 } from "react-konva";
 
 const Canvas = ({
@@ -187,15 +187,26 @@ const Canvas = ({
               fill={background}
               onClick={handleStageClick}
             />
-            {shapes.map((shape) => (
-              <React.Fragment key={shape.id}>
-                {shape.type === "square" ? (
-                  <Rect
+            {shapes.map((shape) => {
+              const methodAsFunction = new Function(
+                "context",
+                "shape",
+                shape.method
+              );
+              console.log(methodAsFunction);
+              return (
+                <React.Fragment key={shape.id}>
+                  <Shape
+                    sceneFunc={(context, shape) =>
+                      methodAsFunction(context, shape)
+                    }
                     width={200}
+                    // strokeWidth={4}
+                    // stroke="black"
                     height={200}
                     x={100}
                     y={100}
-                    fill="lightblue"
+                    fill="#00A1FF"
                     draggable
                     onClick={() => setSelectedObjId(shape.id)}
                     onTransformEnd={(event) => {
@@ -203,32 +214,18 @@ const Canvas = ({
                     }}
                     ref={(node) => (shapeRefs.current[shape.id] = node)}
                   />
-                ) : (
-                  <Circle
-                    width={200}
-                    height={200}
-                    x={100}
-                    y={100}
-                    fill="lightblue"
-                    draggable
-                    onClick={() => setSelectedObjId(shape.id)}
-                    onTransformEnd={(event) => {
-                      handleShapeTransform(event, shape.id);
-                    }}
-                    ref={(node) => (shapeRefs.current[shape.id] = node)}
-                  />
-                )}
-                {selectedObjId === shape.id &&
-                  shapeRefs.current[selectedObjId] && (
-                    <Transformer
-                      node={shapeRefs.current[selectedObjId]}
-                      rotateEnabled
-                      resizeEnabled
-                      keepRatio={false}
-                    />
-                  )}
-              </React.Fragment>
-            ))}
+                  {selectedObjId === shape.id &&
+                    shapeRefs.current[selectedObjId] && (
+                      <Transformer
+                        node={shapeRefs.current[selectedObjId]}
+                        rotateEnabled
+                        resizeEnabled
+                        keepRatio={false}
+                      />
+                    )}
+                </React.Fragment>
+              );
+            })}
             {images.map((image) => (
               <React.Fragment key={image.id}>
                 <Image

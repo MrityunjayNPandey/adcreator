@@ -5,24 +5,11 @@ import MuiAccordion from "@mui/material/Accordion";
 import MuiAccordionSummary from "@mui/material/AccordionSummary";
 import MuiAccordionDetails from "@mui/material/AccordionDetails";
 import Typography from "@mui/material/Typography";
-import {
-  Box,
-  Button,
-  Grid,
-  TextField,
-  InputAdornment,
-  CircularProgress,
-} from "@mui/material";
-import {
-  backgroundColors,
-  iconsList,
-  shapesList,
-  templateList,
-  textStyles,
-} from "../Utils/Constants";
+import { Button, Grid } from "@mui/material";
+import { iconsList, templateList } from "../Utils/Constants";
 import { v4 as uuidv4 } from "uuid";
-import SearchIcon from "@mui/icons-material/Search";
 import { createClient } from "pexels";
+import { Background, Photos, Shapes, Text, Uploads } from "../Components";
 
 const Accordion = styled((props) => (
   <MuiAccordion disableGutters elevation={0} square {...props} />
@@ -92,12 +79,12 @@ function MenuBar({
     const fetchImages = () => {
       setLoading(true);
       client.photos
-        .search({ query, per_page: 100 })
+        .search({ query, per_page: 100, size: "small" })
         .then((res) => {
           const photos = res.photos;
 
           const fetchedImages = photos.map((photo) => {
-            const imageUrl = photo.src.original;
+            const imageUrl = photo.src.large;
             const imageId = photo.id;
             return {
               id: imageId,
@@ -224,17 +211,18 @@ function MenuBar({
     try {
       const convertedSrc = await getBase64FromImageUrl(src);
       if (convertedSrc) {
-        addingItemsToCanvas(convertedSrc, "photo", 0.1, 100);
+        addingItemsToCanvas(convertedSrc, "photo", 0.6, 100);
       }
     } catch (error) {
       console.log(error);
     }
   };
 
-  const handleAddShape = (name) => {
+  const handleAddShape = (name, method) => {
     const newObj = {
       id: uuidv4(),
       type: name,
+      method,
     };
 
     setShapes((prevShapes) => [...prevShapes, newObj]);
@@ -250,24 +238,7 @@ function MenuBar({
           <Typography>Background</Typography>
         </AccordionSummary>
         <AccordionDetails>
-          <Grid container spacing={2}>
-            {backgroundColors.map((item, index) => (
-              <Grid item md={3} key={index}>
-                <Button
-                  onClick={() => handleBackground(item)}
-                  sx={{
-                    width: "100%",
-                    background: item,
-                    height: "10vh",
-                    ":hover": {
-                      background: item,
-                      border: "1px solid #fff",
-                    },
-                  }}
-                ></Button>
-              </Grid>
-            ))}
-          </Grid>
+          <Background handleBackground={handleBackground} />
         </AccordionDetails>
       </Accordion>
       <Accordion
@@ -278,27 +249,7 @@ function MenuBar({
           <Typography>Text</Typography>
         </AccordionSummary>
         <AccordionDetails>
-          <Grid container spacing={1}>
-            {textStyles.map((item, index) => (
-              <Grid item md={6} key={index}>
-                <Button
-                  sx={{ width: "100%", height: "20vh" }}
-                  onClick={() =>
-                    addTextToCanvas(item.font, item.color, item.val)
-                  }
-                >
-                  <img
-                    src={item.img}
-                    alt="text"
-                    style={{
-                      width: "100%",
-                      filter: item.color === "#000" ? "invert(100%)" : "none",
-                    }}
-                  />
-                </Button>
-              </Grid>
-            ))}
-          </Grid>
+          <Text addTextToCanvas={addTextToCanvas} />
         </AccordionDetails>
       </Accordion>
       <Accordion
@@ -309,74 +260,13 @@ function MenuBar({
           <Typography>Photos</Typography>
         </AccordionSummary>
         <AccordionDetails>
-          <TextField
-            variant="standard"
-            defaultValue={query}
-            onChange={debouncedHandleQueryChange}
-            placeholder="Search..."
-            sx={{
-              width: "100%",
-              background: "#27272A",
-              mb: 2,
-              padding: "0px 5px",
-              input: {
-                color: "#fff",
-              },
-            }}
-            InputProps={{
-              disableUnderline: true,
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon sx={{ color: "#fff" }} />
-                </InputAdornment>
-              ),
-            }}
+          <Photos
+            AddPhotoToCanvas={AddPhotoToCanvas}
+            debouncedHandleQueryChange={debouncedHandleQueryChange}
+            pexelPhotos={pexelPhotos}
+            loading={loading}
+            query={query}
           />
-          <Typography sx={{ textAlign: "center", mb: 2 }}>
-            Photos by Pexel
-          </Typography>
-          {loading ? (
-            <Box sx={{ textAlign: "center" }}>
-              <CircularProgress sx={{ color: "#fff" }} />
-            </Box>
-          ) : (
-            <Grid container spacing={1}>
-              <Grid item md={6}>
-                {pexelPhotos.slice(0, 15).map((photo) => (
-                  <Button
-                    onClick={() => AddPhotoToCanvas(photo.id, photo.src)}
-                    disableRipple
-                    sx={{ width: "100%", padding: 0, mb: 1 }}
-                  >
-                    <img
-                      key={photo.id}
-                      src={photo.src}
-                      alt="photo"
-                      style={{ width: "100%", borderRadius: "5px" }}
-                      loading="lazy"
-                    />
-                  </Button>
-                ))}
-              </Grid>
-              <Grid item md={6}>
-                {pexelPhotos.slice(16, 30).map((photo) => (
-                  <Button
-                    onClick={() => AddPhotoToCanvas(photo.id, photo.src)}
-                    disableRipple
-                    sx={{ width: "100%", padding: 0, mb: 1 }}
-                  >
-                    <img
-                      key={photo.id}
-                      src={photo.src}
-                      alt="photo"
-                      style={{ width: "100%", borderRadius: "5px" }}
-                      loading="lazy"
-                    />
-                  </Button>
-                ))}
-              </Grid>
-            </Grid>
-          )}
         </AccordionDetails>
       </Accordion>
       <Accordion
@@ -387,61 +277,11 @@ function MenuBar({
           <Typography>Uploads</Typography>
         </AccordionSummary>
         <AccordionDetails>
-          <Box>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleImageUpload}
-              style={{ display: "none" }}
-              id="image-upload"
-            />
-            <label htmlFor="image-upload">
-              <Button
-                disableRipple
-                sx={{
-                  background: "#27272A",
-                  border: "1px solid #3F3F46",
-                  width: "100%",
-                  "&:hover": {
-                    background: "#3F3F46",
-                    border: "1px solid #3F3F46",
-                  },
-                  color: "#fff",
-                  textTransform: "capitalize",
-                }}
-                component="span"
-                variant="outlined"
-              >
-                <Box
-                  display="flex"
-                  flexDirection="column"
-                  justifyContent="center"
-                  alignItems="center"
-                >
-                  <Typography>Upload Image</Typography>
-                </Box>
-              </Button>
-            </label>
-          </Box>
-          <Box sx={{ mt: 1 }}>
-            <Grid container spacing={1}>
-              {uploadedImage.map((image, index) => (
-                <Grid key={index} item md={6}>
-                  <Button
-                    disableRipple
-                    sx={{ width: "100%" }}
-                    onClick={() => AddImageToCanvas(image.id)}
-                  >
-                    <img
-                      src={image.src}
-                      alt="uploadedImage"
-                      style={{ width: "100%" }}
-                    />
-                  </Button>
-                </Grid>
-              ))}
-            </Grid>
-          </Box>
+          <Uploads
+            handleImageUpload={handleImageUpload}
+            uploadedImage={uploadedImage}
+            AddImageToCanvas={AddImageToCanvas}
+          />
         </AccordionDetails>
       </Accordion>
       <Accordion
@@ -452,27 +292,7 @@ function MenuBar({
           <Typography>Shapes</Typography>
         </AccordionSummary>
         <AccordionDetails>
-          <Grid container spacing={4}>
-            {shapesList.map((shape) => (
-              <Grid key={shape.name} item md={6}>
-                <Button
-                  onClick={() => handleAddShape(shape.name)}
-                  sx={{
-                    width: "100%",
-                    minHeight: "20vh",
-                    background: "lightblue",
-                    opacity: 0.3,
-                    borderRadius: shape.radius,
-                    border: "3px solid transparent",
-                    ":hover": {
-                      background: "lightblue",
-                      border: "3px solid #fff",
-                    },
-                  }}
-                ></Button>
-              </Grid>
-            ))}
-          </Grid>
+          <Shapes handleAddShape={handleAddShape} />
         </AccordionDetails>
       </Accordion>
       <Accordion

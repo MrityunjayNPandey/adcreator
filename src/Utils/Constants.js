@@ -69,11 +69,70 @@ export const textStyles = [
 export const shapesList = [
   {
     name: "square",
-    radius: "none",
+    src: "assets/shapes/rectangle.svg",
+    method: `context.beginPath();
+      context.moveTo(0, 0);
+      context.lineTo(200, 0);
+      context.lineTo(200, 200);
+      context.lineTo(0, 200);
+      context.closePath();
+      context.fillStrokeShape(shape);`,
   },
   {
     name: "circle",
-    radius: "50%",
+    src: "assets/shapes/circle.svg",
+    method: `const x = 100;
+    const y = 100;
+    const radius = 100;
+    context.beginPath();
+    context.arc(x, y, radius, 0, 2 * Math.PI);
+    context.closePath();
+    context.fillStrokeShape(shape);`,
+  },
+  {
+    name: "triangle",
+    src: "assets/shapes/triangle.svg",
+    method: `const points = [0, 200, 100, 0, 200, 200];
+    context.beginPath();
+    context.moveTo(points[0], points[1]);
+    context.lineTo(points[2], points[3]);
+    context.lineTo(points[4], points[5]);
+    context.closePath();
+    context.fillStrokeShape(shape);`,
+  },
+  {
+    name: "arrow",
+    src: "assets/shapes/arrow.svg",
+    method: `const arrowWidth = 100;
+    const arrowHeight = 50;
+    const triangleHeight = 40;
+    context.beginPath();
+    context.moveTo(0, 15);
+    context.lineTo(arrowWidth, 15);
+    context.lineTo(arrowWidth, 35);
+    context.lineTo(0, 35);
+    context.closePath();
+    context.moveTo(arrowWidth, arrowHeight / 2);
+    context.lineTo(arrowWidth + triangleHeight, arrowHeight / 2);
+    context.lineTo(arrowWidth, 0);
+    context.closePath();
+    context.moveTo(arrowWidth, arrowHeight / 2);
+    context.lineTo(arrowWidth + triangleHeight, arrowHeight / 2);
+    context.lineTo(arrowWidth, 50);
+    context.closePath();
+    context.fillStrokeShape(shape);`,
+  },
+  {
+    name: "pentagon",
+    src: "assets/shapes/pentagon.svg",
+    method: `context.beginPath();
+    context.moveTo(100, 0);
+    context.lineTo(200, 50);
+    context.lineTo(160, 150);
+    context.lineTo(40, 150);
+    context.lineTo(0, 50);
+    context.closePath();
+    context.fillStrokeShape(shape);`,
   },
 ];
 
