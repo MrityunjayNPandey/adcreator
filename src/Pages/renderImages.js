@@ -15,13 +15,10 @@ import {
 } from "@material-ui/core";
 
 import { useDispatch, useSelector } from "react-redux";
-import {
-  setSelectedCategory,
-  setPhotos,
-  setSelectedPhoto,
-} from "../Redux/actions";
+import { setPhotos, setSelectedPhoto } from "../Redux/actions";
 import { useNavigate } from "react-router-dom";
 import Loader from "react-loader";
+import { debounce } from "lodash";
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -97,9 +94,7 @@ const useStyles = makeStyles((theme) => ({
 const RenderImages = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
-  const { selectedCategory, photos, selectedPhoto } = useSelector(
-    (state) => state
-  );
+  const { photos, selectedPhoto } = useSelector((state) => state);
 
   const API_KEY_PEXEL =
     "ggFV9hScofwUZWxCLuuW4tphfIJZmgGFKh6k63yrTLp7PVjIKbj9Qd2O";
@@ -111,6 +106,7 @@ const RenderImages = () => {
   const PER_PAGE = 10;
   const INIT_FETCH = 10 * PER_PAGE;
 
+  const [selectedCategory, setSelectedCategory] = useState("random");
   const YOUR_SEARCH_QUERY = selectedCategory;
   const API_ENDPOINT_PEXEL = `https://api.pexels.com/v1/search?query=${YOUR_SEARCH_QUERY}&per_page=${INIT_FETCH}&page=${fetchedPage}`;
   const API_ENDPOINT_UNSPLASH = `https://api.unsplash.com/search/photos/?client_id=${API_KEY_UNSPLASH}`;
@@ -121,6 +117,7 @@ const RenderImages = () => {
     const fetchPhotos = async () => {
       try {
         setLoading(true);
+        console.log(API_ENDPOINT_PEXEL);
         const responsePexel = await axios.get(API_ENDPOINT_PEXEL, {
           headers: {
             Authorization: API_KEY_PEXEL,
@@ -137,7 +134,7 @@ const RenderImages = () => {
           responsePexel.data.photos.map(async (photo) => ({
             id: photo.id,
             type: "image",
-            src: await getBase64FromImageUrl(photo.src.large),
+            src: photo.src.large,
           }))
         );
         console.log(newPhotosPexel);
@@ -145,7 +142,7 @@ const RenderImages = () => {
           responseUnsplash.data.results.map(async (photo) => ({
             id: photo.id,
             type: "image",
-            src: await getBase64FromImageUrl(photo.urls.regular),
+            src: photo.urls.regular,
           }))
         );
         console.log(newPhotosUnsplash);
@@ -196,15 +193,24 @@ const RenderImages = () => {
   const navigate = useNavigate();
 
   const handleCategoryChange = (event) => {
+    const newCategory = event.target.value;
     dispatch(setPhotos([]));
     setFetchedPage(1);
     setCurrentPage(1);
     setTotalPages(1);
-    dispatch(setSelectedCategory(event.target.value));
+    setSelectedCategory(newCategory);
+    console.log(newCategory, selectedCategory);
   };
 
-  const handlePhotoSelect = (photo) => {
-    dispatch(setSelectedPhoto(photo));
+  const debouncedHandleCategoryChange = debounce(handleCategoryChange, 500);
+
+  const handlePhotoSelect = async (photo) => {
+    const { src, ...args } = photo;
+    console.log(src, args);
+    dispatch(
+      setSelectedPhoto({ ...args, src: await getBase64FromImageUrl(src) })
+    );
+    console.log(selectedPhoto);
   };
 
   const handlePageChange = (newPage) => {
@@ -225,8 +231,8 @@ const RenderImages = () => {
         <TextField
           type="text"
           label="Search Images"
-          value={selectedCategory}
-          onChange={handleCategoryChange}
+          defaultValue={selectedCategory}
+          onChange={debouncedHandleCategoryChange}
         />
         <FormControl className={classes.select}>
           <InputLabel id="category-label">Our Suggestions</InputLabel>
@@ -270,7 +276,7 @@ const RenderImages = () => {
                 <Card
                   key={photo.id}
                   className={`${classes.card} ${
-                    selectedPhoto === photo ? "selected" : ""
+                    selectedPhoto?.id === photo?.id ? "selected" : ""
                   }`}
                   onClick={() => handlePhotoSelect(photo)}
                 >
