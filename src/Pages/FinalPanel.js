@@ -115,12 +115,23 @@ const compressImage = (imageDataUrl, maxSizeInBytes) => {
 const FinalPanel = () => {
   const classes = useStyles();
   const { finalPhoto } = useSelector((state) => state);
+  //   console.log("finalPhoto", finalPhoto);
+
+  const handleDownload = () => {
+    const link = document.createElement("a");
+    link.href = finalPhoto;
+    link.download = "finalImage.jpg"; // Set the desired file name
+    link.target = "_blank";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   const dispatch = useDispatch();
 
   const handleSave = async () => {
     const imageFile = finalPhoto;
-    const maxSizeInBytes = 1000; 
+    const maxSizeInBytes = 1; // Bytes
     console.log(imageFile.length);
     if (imageFile.length > maxSizeInBytes) {
       const compressedImageDataURL = await compressImage(
@@ -147,6 +158,13 @@ const FinalPanel = () => {
             />
           </div>
         )}
+        <Button
+          variant="contained"
+          className={classes.redButton}
+          onClick={handleDownload}
+        >
+          Download
+        </Button>
         <Button
           variant="contained"
           color="primary"

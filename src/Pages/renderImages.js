@@ -134,7 +134,7 @@ const RenderImages = () => {
           responsePexel.data.photos.map(async (photo) => ({
             id: photo.id,
             type: "image",
-            src: photo.src.large,
+            src: photo.src,
           }))
         );
         console.log(newPhotosPexel);
@@ -142,7 +142,7 @@ const RenderImages = () => {
           responseUnsplash.data.results.map(async (photo) => ({
             id: photo.id,
             type: "image",
-            src: photo.urls.regular,
+            src: photo.urls,
           }))
         );
         console.log(newPhotosUnsplash);
@@ -208,7 +208,10 @@ const RenderImages = () => {
     const { src, ...args } = photo;
     console.log(src, args);
     dispatch(
-      setSelectedPhoto({ ...args, src: await getBase64FromImageUrl(src) })
+      setSelectedPhoto({
+        ...args,
+        src: await getBase64FromImageUrl(src.large || src.full),
+      })
     );
     console.log(selectedPhoto);
   };
@@ -280,7 +283,11 @@ const RenderImages = () => {
                   }`}
                   onClick={() => handlePhotoSelect(photo)}
                 >
-                  <CardMedia component="img" src={photo.src} alt={photo.id} />
+                  <CardMedia
+                    component="img"
+                    src={photo.src.medium || photo.src.regular}
+                    alt={photo.id}
+                  />
                 </Card>
               ))}
             </div>
