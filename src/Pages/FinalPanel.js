@@ -147,7 +147,7 @@ const FinalPanel = () => {
     <Container className={classes.container}>
       <form className={classes.form}>
         <Typography variant="h4" gutterBottom>
-          Step 5: Final Image Preview
+          Final Image
         </Typography>
         {finalPhoto && (
           <div>
@@ -158,13 +158,13 @@ const FinalPanel = () => {
             />
           </div>
         )}
-        <Button
+        {/* <Button
           variant="contained"
           className={classes.redButton}
           onClick={handleDownload}
         >
           Download
-        </Button>
+        </Button> */}
         <Button
           variant="contained"
           color="primary"
