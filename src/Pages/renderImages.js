@@ -100,6 +100,7 @@ const RenderImages = () => {
     "ggFV9hScofwUZWxCLuuW4tphfIJZmgGFKh6k63yrTLp7PVjIKbj9Qd2O";
   const API_KEY_UNSPLASH = "IEKwy9pi9HGWBmT1vDbHNTpHp7J41vfAHmb0F0_m5Do";
 
+  const [chosenPhoto, setChosenPhoto] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [fetchedPage, setFetchedPage] = useState(1);
@@ -174,6 +175,7 @@ const RenderImages = () => {
 
   const getBase64FromImageUrl = async (imageUrl) => {
     try {
+      setLoading(true);
       const response = await fetch(imageUrl);
       const blob = await response.blob();
       const reader = new FileReader();
@@ -183,6 +185,7 @@ const RenderImages = () => {
         };
         reader.onerror = reject;
         reader.readAsDataURL(blob);
+        setLoading(false);
       });
     } catch (error) {
       console.log(error);
@@ -279,9 +282,9 @@ const RenderImages = () => {
                 <Card
                   key={photo.id}
                   className={`${classes.card} ${
-                    selectedPhoto?.id === photo?.id ? "selected" : ""
+                    chosenPhoto?.id === photo?.id ? "selected" : ""
                   }`}
-                  onClick={() => handlePhotoSelect(photo)}
+                  onClick={() => setChosenPhoto(photo)}
                 >
                   <CardMedia
                     component="img"
@@ -312,7 +315,8 @@ const RenderImages = () => {
         <Button
           variant="contained"
           className={classes.blueButton}
-          onClick={() => {
+          onClick={async () => {
+            await handlePhotoSelect(chosenPhoto);
             navigate("/preview");
           }}
         >
