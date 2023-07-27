@@ -60,11 +60,9 @@ const AccordionDetails = styled(MuiAccordionDetails)(({ theme }) => ({
 
 function MenuBar({
   setBackground,
-  setTexts,
   uploadedImage,
   setUploadedImage,
-  setImages,
-  setShapes,
+  setCanvasElements,
 }) {
   const [expanded, setExpanded] = React.useState("panel1");
   const [pexelPhotos, setPexelPhotos] = useState([]);
@@ -75,7 +73,6 @@ function MenuBar({
   );
 
   useEffect(() => {
-    console.log(query);
     const fetchImages = () => {
       setLoading(true);
       client.photos
@@ -91,7 +88,6 @@ function MenuBar({
               src: imageUrl,
             };
           });
-          console.log(photos);
           setPexelPhotos(fetchedImages);
           setLoading(false);
         })
@@ -145,7 +141,7 @@ function MenuBar({
   };
 
   const addTextToCanvas = (font, color, val) => {
-    setTexts((prev) => [
+    setCanvasElements((prev) => [
       ...prev,
       {
         id: uuidv4(),
@@ -189,7 +185,7 @@ function MenuBar({
         y: pos,
       };
       htmlImage.classList.add("canvas-image");
-      setImages((prev) => [...prev, updatedImage]);
+      setCanvasElements((prev) => [...prev, updatedImage]);
     };
     htmlImage.src = src;
   };
@@ -221,11 +217,10 @@ function MenuBar({
   const handleAddShape = (name, method) => {
     const newObj = {
       id: uuidv4(),
-      type: name,
+      type: "shape",
       method,
     };
-
-    setShapes((prevShapes) => [...prevShapes, newObj]);
+    setCanvasElements((prev) => [...prev, newObj]);
   };
 
   return (

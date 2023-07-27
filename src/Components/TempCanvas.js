@@ -10,7 +10,7 @@ import {
   Shape,
 } from "react-konva";
 
-const Canvas = ({
+const TempCanvas = ({
   background,
   selectedId,
   setSelectedId,
@@ -168,7 +168,7 @@ const Canvas = ({
                     height={200}
                     x={100}
                     y={100}
-                    fill={element.color || "#00A1FF"}
+                    fill="#00A1FF"
                     draggable
                     onClick={() => setSelectedObjId(element.id)}
                     onDragEnd={(event) =>
@@ -288,4 +288,4 @@ const Canvas = ({
   );
 };
 
-export default memo(Canvas);
+export default memo(TempCanvas);

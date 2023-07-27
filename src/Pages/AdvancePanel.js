@@ -14,21 +14,18 @@ const drawerWidth = 350;
 
 export default function AdvancePanel() {
   const [background, setBackground] = useState("white");
-  const [texts, setTexts] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
   const [selectedObjId, setSelectedObjId] = useState(null);
   const [style, setStyle] = useState("");
   const [textSize, setTextSize] = useState("");
   const [textColor, setTextColor] = useState("");
   const [uploadedImage, setUploadedImage] = useState([]);
-  const [images, setImages] = useState([]);
-  const [shapes, setShapes] = useState([]);
+  const [canvasElements, setCanvasElements] = useState([]);
   const stageRef = useRef(null);
 
   //example of how to use:
   //contains: id, type, src(base64)
   const { selectedPhoto } = useSelector((state) => state);
-  console.log("selectedPhoto", selectedPhoto);
 
   useEffect(() => {
     if (selectedPhoto) {
@@ -45,13 +42,12 @@ export default function AdvancePanel() {
           y: 0,
         };
         htmlImage.classList.add("canvas-image");
-        setImages((prev) => [...prev, updatedImage]);
+        setCanvasElements((prev) => [...prev, updatedImage]);
       };
       htmlImage.src = image.src;
     }
   }, [selectedPhoto]);
 
-  console.log(shapes);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -60,6 +56,8 @@ export default function AdvancePanel() {
     dispatch(setFinalPhoto(uri));
     navigate("/finalpanel");
   };
+
+  console.log(canvasElements);
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -102,11 +100,9 @@ export default function AdvancePanel() {
         <Box sx={{ overflow: "auto" }}>
           <MenuBar
             setBackground={setBackground}
-            setTexts={setTexts}
             uploadedImage={uploadedImage}
             setUploadedImage={setUploadedImage}
-            setImages={setImages}
-            setShapes={setShapes}
+            setCanvasElements={setCanvasElements}
           />
         </Box>
       </Drawer>
@@ -125,33 +121,26 @@ export default function AdvancePanel() {
         <EditToolbar
           selectedId={selectedId}
           style={style}
-          setTexts={setTexts}
           setStyle={setStyle}
           setTextSize={setTextSize}
           textSize={textSize}
           setTextColor={setTextColor}
           textColor={textColor}
           selectedObjId={selectedObjId}
-          setImages={setImages}
-          setShapes={setShapes}
-          images={images}
+          setCanvasElements={setCanvasElements}
         />
         <Canvas
           background={background}
-          texts={texts}
-          setTexts={setTexts}
           selectedId={selectedId}
           setSelectedId={setSelectedId}
           setStyle={setStyle}
           setTextSize={setTextSize}
           setTextColor={setTextColor}
-          images={images}
-          setImages={setImages}
           stageRef={stageRef}
-          shapes={shapes}
           selectedObjId={selectedObjId}
           setSelectedObjId={setSelectedObjId}
-          setShapes={setShapes}
+          canvasElements={canvasElements}
+          setCanvasElements={setCanvasElements}
         />
       </Box>
     </Box>
