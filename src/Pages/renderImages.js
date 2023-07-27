@@ -229,20 +229,19 @@ const RenderImages = () => {
   return (
     <Container className={classes.container}>
       <form className={classes.form}>
-        <Typography variant="h4" gutterBottom>
-          Search Images
-        </Typography>
         <TextField
           type="text"
-          label="Search Images"
+          id="outlined-basic"
+          label="Search"
+          variant="outlined"
           defaultValue={selectedCategory}
           onChange={debouncedHandleCategoryChange}
         />
         <FormControl className={classes.select}>
           <InputLabel id="category-label">Our Suggestions</InputLabel>
           <Select
-            labelId="category-label"
-            value={selectedCategory}
+            labelId="demo-simple-select-label"
+            id="demo-simple-select"
             onChange={handleCategoryChange}
           >
             <MenuItem value="Random" selected>
