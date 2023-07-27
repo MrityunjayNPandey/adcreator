@@ -118,7 +118,6 @@ const RenderImages = () => {
     const fetchPhotos = async () => {
       try {
         setLoading(true);
-        console.log(API_ENDPOINT_PEXEL);
         const responsePexel = await axios.get(API_ENDPOINT_PEXEL, {
           headers: {
             Authorization: API_KEY_PEXEL,
@@ -128,25 +127,21 @@ const RenderImages = () => {
           params: {
             query: YOUR_SEARCH_QUERY,
             page: fetchedPage,
-            per_page: INIT_FETCH, // Number of results per page
+            per_page: INIT_FETCH,
           },
         });
-        const newPhotosPexel = await Promise.all(
-          responsePexel.data.photos.map(async (photo) => ({
-            id: photo.id,
-            type: "image",
-            src: photo.src,
-          }))
-        );
-        console.log(newPhotosPexel);
-        const newPhotosUnsplash = await Promise.all(
-          responseUnsplash.data.results.map(async (photo) => ({
+        const newPhotosPexel = responsePexel.data.photos.map((photo) => ({
+          id: photo.id,
+          type: "image",
+          src: photo.src,
+        }));
+        const newPhotosUnsplash = responseUnsplash.data.results.map(
+          (photo) => ({
             id: photo.id,
             type: "image",
             src: photo.urls,
-          }))
+          })
         );
-        console.log(newPhotosUnsplash);
         const updatedPhotos = [
           ...photos,
           ...newPhotosPexel,
@@ -170,6 +165,7 @@ const RenderImages = () => {
         await fetchPhotos();
       }
     };
+
     fetchData();
   }, [YOUR_SEARCH_QUERY, currentPage]);
 
