@@ -3,22 +3,16 @@ import { makeStyles } from "@material-ui/core/styles";
 import { Container, Button } from "@material-ui/core";
 
 import { useDispatch, useSelector } from "react-redux";
-import { setSelectedPhoto } from "../Redux/actions"; // Assuming you have your action creators in a separate file
+import { setSelectedPhoto } from "../Redux/actions"; 
 import { v4 as uuidv4 } from "uuid";
 import { useNavigate } from "react-router-dom";
 
 import Typography from "@material-ui/core/Typography";
-import Card from "@material-ui/core/Card";
-import CardActionArea from "@material-ui/core/CardActionArea";
-import CardActions from "@material-ui/core/CardActions";
-import CardContent from "@material-ui/core/CardContent";
-import CardMedia from "@material-ui/core/CardMedia";
 import Box from "@material-ui/core/Box";
 
 import {
   FiCard,
   FiCardActionArea,
-  FiCardActions,
   FiCardContent,
   FiCardMedia,
 } from "./FullImageCard";
@@ -33,35 +27,31 @@ const useStyles = makeStyles({
     height: "100vh",
     textAlign: "center",
   },
-  /**
-   * Max Card with for demo
-   * same values used in Material-Ui Card Demos
-   */
   card: {
     maxWidth: 345,
     height: 150,
     borderRadius: 16,
     overflow: "hidden",
-    position: "relative", // Set the card as a relative container
+    position: "relative", 
     "&:hover": {
       "& $fiCardMedia": {
-        transform: "scale(1.1)", // Increase scale on hover to create darkening effect
-        transition: "transform 0.3s ease", // Add smooth transition
+        transform: "scale(1.1)", 
+        transition: "transform 0.3s ease", 
       },
       "& $fiCardContent": {
-        backgroundColor: "rgba(0, 0, 0, 0.5)", // Darken background on hover
+        backgroundColor: "rgba(0, 0, 0, 0.5)", 
       },
     },
   },
   fiCardMedia: {
     height: 300,
-    transition: "transform 0.3s ease", // Add smooth transition for initial scale
+    transition: "transform 0.3s ease", 
   },
   fiCardContent: {
-    height: 300, // Adjust the height to your preference
+    height: 300, 
     color: "#ffffff",
-    backgroundColor: "rgba(0, 0, 0, 0.24)", // Set transparent background initially
-    transition: "background-color 0.3s ease", // Add smooth transition
+    backgroundColor: "rgba(0, 0, 0, 0.24)", 
+    transition: "background-color 0.3s ease", 
   },
 
   /**
@@ -87,7 +77,7 @@ const Choose = () => {
 
   const handleSubmit = () => {
     navigate("/editor");
-    // Handle form submission
+    
     console.log("Project Name:", projectName);
     console.log("Description:", description);
     console.log("Selected Category:", selectedCategory);

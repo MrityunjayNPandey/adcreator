@@ -55,7 +55,9 @@ const useStyles = makeStyles((theme) => ({
     overflow: "auto",
     "& .MuiCard-root": {
       width: 200,
-      height: 200,
+      height: 150,
+      borderRadius: 16,
+      overflow: "hidden",
       margin: theme.spacing(1),
       display: "flex",
       alignItems: "center",
