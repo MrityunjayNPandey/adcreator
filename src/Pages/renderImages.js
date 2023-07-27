@@ -15,13 +15,10 @@ import {
 } from "@material-ui/core";
 
 import { useDispatch, useSelector } from "react-redux";
-import {
-  setSelectedCategory,
-  setPhotos,
-  setSelectedPhoto,
-} from "../Redux/actions";
+import { setPhotos, setSelectedPhoto } from "../Redux/actions";
 import { useNavigate } from "react-router-dom";
 import Loader from "react-loader";
+import { debounce } from "lodash";
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -58,7 +55,9 @@ const useStyles = makeStyles((theme) => ({
     overflow: "auto",
     "& .MuiCard-root": {
       width: 200,
-      height: 200,
+      height: 150,
+      borderRadius: 16,
+      overflow: "hidden",
       margin: theme.spacing(1),
       display: "flex",
       alignItems: "center",
@@ -97,20 +96,20 @@ const useStyles = makeStyles((theme) => ({
 const RenderImages = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
-  const { selectedCategory, photos, selectedPhoto } = useSelector(
-    (state) => state
-  );
+  const { photos, selectedPhoto } = useSelector((state) => state);
 
   const API_KEY_PEXEL =
     "ggFV9hScofwUZWxCLuuW4tphfIJZmgGFKh6k63yrTLp7PVjIKbj9Qd2O";
   const API_KEY_UNSPLASH = "IEKwy9pi9HGWBmT1vDbHNTpHp7J41vfAHmb0F0_m5Do";
 
+  const [chosenPhoto, setChosenPhoto] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [fetchedPage, setFetchedPage] = useState(1);
   const PER_PAGE = 10;
   const INIT_FETCH = 10 * PER_PAGE;
 
+  const [selectedCategory, setSelectedCategory] = useState("random");
   const YOUR_SEARCH_QUERY = selectedCategory;
   const API_ENDPOINT_PEXEL = `https://api.pexels.com/v1/search?query=${YOUR_SEARCH_QUERY}&per_page=${INIT_FETCH}&page=${fetchedPage}`;
   const API_ENDPOINT_UNSPLASH = `https://api.unsplash.com/search/photos/?client_id=${API_KEY_UNSPLASH}`;
@@ -130,25 +129,21 @@ const RenderImages = () => {
           params: {
             query: YOUR_SEARCH_QUERY,
             page: fetchedPage,
-            per_page: INIT_FETCH, // Number of results per page
+            per_page: INIT_FETCH,
           },
         });
-        const newPhotosPexel = await Promise.all(
-          responsePexel.data.photos.map(async (photo) => ({
+        const newPhotosPexel = responsePexel.data.photos.map((photo) => ({
+          id: photo.id,
+          type: "image",
+          src: photo.src,
+        }));
+        const newPhotosUnsplash = responseUnsplash.data.results.map(
+          (photo) => ({
             id: photo.id,
             type: "image",
-            src: await getBase64FromImageUrl(photo.src.large),
-          }))
+            src: photo.urls,
+          })
         );
-        console.log(newPhotosPexel);
-        const newPhotosUnsplash = await Promise.all(
-          responseUnsplash.data.results.map(async (photo) => ({
-            id: photo.id,
-            type: "image",
-            src: await getBase64FromImageUrl(photo.urls.regular),
-          }))
-        );
-        console.log(newPhotosUnsplash);
         const updatedPhotos = [
           ...photos,
           ...newPhotosPexel,
@@ -172,11 +167,13 @@ const RenderImages = () => {
         await fetchPhotos();
       }
     };
+
     fetchData();
   }, [YOUR_SEARCH_QUERY, currentPage]);
 
   const getBase64FromImageUrl = async (imageUrl) => {
     try {
+      setLoading(true);
       const response = await fetch(imageUrl);
       const blob = await response.blob();
       const reader = new FileReader();
@@ -186,6 +183,7 @@ const RenderImages = () => {
         };
         reader.onerror = reject;
         reader.readAsDataURL(blob);
+        setLoading(false);
       });
     } catch (error) {
       console.log(error);
@@ -196,15 +194,27 @@ const RenderImages = () => {
   const navigate = useNavigate();
 
   const handleCategoryChange = (event) => {
+    const newCategory = event.target.value;
     dispatch(setPhotos([]));
     setFetchedPage(1);
     setCurrentPage(1);
     setTotalPages(1);
-    dispatch(setSelectedCategory(event.target.value));
+    setSelectedCategory(newCategory);
+    console.log(newCategory, selectedCategory);
   };
 
-  const handlePhotoSelect = (photo) => {
-    dispatch(setSelectedPhoto(photo));
+  const debouncedHandleCategoryChange = debounce(handleCategoryChange, 500);
+
+  const handlePhotoSelect = async (photo) => {
+    const { src, ...args } = photo;
+    console.log(src, args);
+    dispatch(
+      setSelectedPhoto({
+        ...args,
+        src: await getBase64FromImageUrl(src.large || src.full),
+      })
+    );
+    console.log(selectedPhoto);
   };
 
   const handlePageChange = (newPage) => {
@@ -219,20 +229,19 @@ const RenderImages = () => {
   return (
     <Container className={classes.container}>
       <form className={classes.form}>
-        <Typography variant="h4" gutterBottom>
-          Search Images
-        </Typography>
         <TextField
           type="text"
-          label="Search Images"
-          value={selectedCategory}
-          onChange={handleCategoryChange}
+          id="outlined-basic"
+          label="Search"
+          variant="outlined"
+          defaultValue={selectedCategory}
+          onChange={debouncedHandleCategoryChange}
         />
         <FormControl className={classes.select}>
           <InputLabel id="category-label">Our Suggestions</InputLabel>
           <Select
-            labelId="category-label"
-            value={selectedCategory}
+            labelId="demo-simple-select-label"
+            id="demo-simple-select"
             onChange={handleCategoryChange}
           >
             <MenuItem value="Random" selected>
@@ -270,11 +279,15 @@ const RenderImages = () => {
                 <Card
                   key={photo.id}
                   className={`${classes.card} ${
-                    selectedPhoto === photo ? "selected" : ""
+                    chosenPhoto?.id === photo?.id ? "selected" : ""
                   }`}
-                  onClick={() => handlePhotoSelect(photo)}
+                  onClick={() => setChosenPhoto(photo)}
                 >
-                  <CardMedia component="img" src={photo.src} alt={photo.id} />
+                  <CardMedia
+                    component="img"
+                    src={photo.src.medium || photo.src.regular}
+                    alt={photo.id}
+                  />
                 </Card>
               ))}
             </div>
@@ -299,7 +312,8 @@ const RenderImages = () => {
         <Button
           variant="contained"
           className={classes.blueButton}
-          onClick={() => {
+          onClick={async () => {
+            await handlePhotoSelect(chosenPhoto);
             navigate("/preview");
           }}
         >

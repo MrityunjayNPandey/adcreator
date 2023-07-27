@@ -1,8 +1,9 @@
 import { makeStyles } from "@material-ui/core/styles";
 import { Container, Typography, Button } from "@material-ui/core";
 
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { setFinalPhoto } from "../Redux/actions";
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -80,8 +81,15 @@ const Preview = () => {
   const { selectedPhoto } = useSelector((state) => state);
   const navigate = useNavigate();
 
-  const handleSubmit = () => {
+  const handleEditor = () => {
     navigate("/editor");
+  };
+
+  const dispatch = useDispatch();
+
+  const handleFinal = () => {
+    dispatch(setFinalPhoto(selectedPhoto.src));
+    navigate("/finalpanel");
   };
 
   return (
@@ -103,10 +111,19 @@ const Preview = () => {
         <Button
           variant="contained"
           color="primary"
-          onClick={handleSubmit}
+          onClick={handleEditor}
           className={classes.blueButton}
         >
           Edit in Editor
+        </Button>
+
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleFinal}
+          className={classes.redButton}
+        >
+          Finalize this Image
         </Button>
       </form>
     </Container>

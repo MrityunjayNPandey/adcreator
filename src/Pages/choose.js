@@ -3,15 +3,23 @@ import { makeStyles } from "@material-ui/core/styles";
 import { Container, Button } from "@material-ui/core";
 
 import { useDispatch, useSelector } from "react-redux";
-import { setSelectedPhoto } from "../Redux/actions"; // Assuming you have your action creators in a separate file
+import { setSelectedPhoto } from "../Redux/actions"; 
 import { v4 as uuidv4 } from "uuid";
 import { useNavigate } from "react-router-dom";
 
-const useStyles = makeStyles((theme) => ({
+import Typography from "@material-ui/core/Typography";
+import Box from "@material-ui/core/Box";
+
+import {
+  FiCard,
+  FiCardActionArea,
+  FiCardContent,
+  FiCardMedia,
+} from "./FullImageCard";
+
+const useStyles = makeStyles({
   container: {
-    maxWidth: 1200,
     margin: "0 auto",
-    padding: theme.spacing(3),
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
@@ -19,64 +27,45 @@ const useStyles = makeStyles((theme) => ({
     height: "100vh",
     textAlign: "center",
   },
-  form: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-    "& > *": {
-      margin: theme.spacing(1),
-      width: "100%",
-    },
-  },
-  select: {
-    color: "white",
-    width: "100%",
-  },
-  mediaContainer: {
-    color: "white",
-    display: "flex",
-    justifyContent: "center",
-    flexWrap: "wrap",
-    marginTop: theme.spacing(3),
-    overflow: "auto",
-    "& .MuiCard-root": {
-      width: 200,
-      height: 200,
-      margin: theme.spacing(1),
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      cursor: "pointer",
-      border: "2px solid transparent",
-      "&.selected": {
-        border: `2px solid ${theme.palette.primary.main}`,
+  card: {
+    maxWidth: 345,
+    height: 150,
+    borderRadius: 16,
+    overflow: "hidden",
+    position: "relative", 
+    "&:hover": {
+      "& $fiCardMedia": {
+        transform: "scale(1.1)", 
+        transition: "transform 0.3s ease", 
+      },
+      "& $fiCardContent": {
+        backgroundColor: "rgba(0, 0, 0, 0.5)", 
       },
     },
   },
-  blueButton: {
-    backgroundColor: "#178bf1",
-    color: "#fff",
-    "&:hover": {
-      backgroundColor: "#0085fa",
-    },
+  fiCardMedia: {
+    height: 300,
+    transition: "transform 0.3s ease", 
   },
-  redButton: {
-    backgroundColor: "#ff4081",
-    color: "#fff",
-    "&:hover": {
-      backgroundColor: "#f50057",
-    },
+  fiCardContent: {
+    height: 300, 
+    color: "#ffffff",
+    backgroundColor: "rgba(0, 0, 0, 0.24)", 
+    transition: "background-color 0.3s ease", 
   },
-  uploadButton: {
-    margin: theme.spacing(1),
-    textTransform: "none",
+
+  /**
+   * Applied to Orginal Card demo
+   * Same vale used in Material-ui Card Demos
+   */
+  media: {
+    height: 140,
   },
-  submitButton: {
-    margin: theme.spacing(2, 0),
-    textTransform: "none",
+
+  fiCardContentTextSecondary: {
+    color: "rgba(255,255,255,0.78)",
   },
-}));
+});
 
 const Choose = () => {
   const classes = useStyles();
@@ -88,7 +77,7 @@ const Choose = () => {
 
   const handleSubmit = () => {
     navigate("/editor");
-    // Handle form submission
+    
     console.log("Project Name:", projectName);
     console.log("Description:", description);
     console.log("Selected Category:", selectedCategory);
@@ -112,43 +101,104 @@ const Choose = () => {
   };
 
   return (
-    <Container className={classes.container}>
-      <form className={classes.form}>
-        <Button
-          variant="contained"
-          className={classes.blueButton}
-          onClick={() => {
-            navigate("/renderimages");
-          }}
-        >
-          Select an Image from our catalogue
-        </Button>
-        <label htmlFor="upload-photo">
-          <Button
-            variant="contained"
-            className={classes.redButton}
-            component="span"
-          >
-            Upload Photo
-          </Button>
-        </label>
-        <input
-          id="upload-photo"
-          type="file"
-          accept="image/*"
-          onChange={handlePhotoUpload}
-          style={{ display: "none" }}
-        />
-
-        <Button
-          variant="contained"
-          className={classes.blueButton}
-          onClick={handleSubmit}
-        >
-          Skip this step and directly edit on editor
-        </Button>
-      </form>
-    </Container>
+    <div>
+      <Container className={classes.container}>
+        <Box display="flex" justifyContent="center">
+          <Box mx={5}>
+            <FiCard className={classes.card}>
+              <FiCardActionArea
+                onClick={() => document.getElementById("upload-photo").click()}
+              >
+                <FiCardMedia
+                  className={classes.fiCardMedia}
+                  media="picture"
+                  alt="Contemplative Reptile"
+                  image="https://images.pexels.com/photos/7004697/pexels-photo-7004697.jpeg?auto=compress&cs=tinysrgb&h=350"
+                  title="Contemplative Reptile"
+                />
+                <FiCardContent className={classes.fiCardContent}>
+                  <Typography gutterBottom variant="h5" component="h2">
+                    Upload an Image
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    className={classes.fiCardContentTextSecondary}
+                    component="p"
+                  >
+                    <br></br>
+                    Have an Image already? Upload it and let's see what we can
+                    do together.
+                  </Typography>
+                </FiCardContent>
+              </FiCardActionArea>
+            </FiCard>
+            <input
+              id="upload-photo"
+              type="file"
+              accept="image/*"
+              onChange={handlePhotoUpload}
+              style={{ display: "none" }}
+            />
+          </Box>
+          <Box mx={5}>
+            <FiCard className={classes.card}>
+              <FiCardActionArea
+                onClick={() => {
+                  navigate("/renderimages");
+                }}
+              >
+                <FiCardMedia
+                  className={classes.fiCardMedia}
+                  media="picture"
+                  alt="Contemplative Reptile"
+                  image="https://images.pexels.com/photos/3844788/pexels-photo-3844788.jpeg?auto=compress&cs=tinysrgb&h=350"
+                  title="Contemplative Reptile"
+                />
+                <FiCardContent className={classes.fiCardContent}>
+                  <Typography gutterBottom variant="h5" component="h2">
+                    Select an Image from our catalogue
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    className={classes.fiCardContentTextSecondary}
+                    component="p"
+                  >
+                    Select an Image from a wide range of collection from Pexels
+                    and Unsplash.
+                  </Typography>
+                </FiCardContent>
+              </FiCardActionArea>
+            </FiCard>
+          </Box>
+          <Box mx={5}>
+            <FiCard className={classes.card}>
+              <FiCardActionArea onClick={handleSubmit}>
+                <FiCardMedia
+                  className={classes.fiCardMedia}
+                  media="picture"
+                  alt="Contemplative Reptile"
+                  image="https://images.pexels.com/photos/1070526/pexels-photo-1070526.jpeg?auto=compress&cs=tinysrgb&h=350"
+                  title="Contemplative Reptile"
+                />
+                <FiCardContent className={classes.fiCardContent}>
+                  <Typography gutterBottom variant="h5" component="h2">
+                    Skip this step and directly edit on our Editor
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    className={classes.fiCardContentTextSecondary}
+                    component="p"
+                  >
+                    Unleash your inner creativity with the help of our own Image
+                    Editor.
+                  </Typography>
+                </FiCardContent>
+              </FiCardActionArea>
+            </FiCard>
+          </Box>
+        </Box>
+      </Container>
+    </div>
   );
 };
 
