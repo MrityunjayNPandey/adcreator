@@ -42,9 +42,15 @@ const useStyles = makeStyles((theme) => ({
       width: "100%",
     },
   },
+  searchInput: {
+    width: "50%",
+    maxWidth: 400,
+    margin: theme.spacing(1),
+  },
   select: {
+    width: "50%",
+    maxWidth: 400,
     color: "white",
-    width: "100%",
   },
   mediaContainer: {
     color: "white",
@@ -75,26 +81,22 @@ const useStyles = makeStyles((theme) => ({
     objectFit: "cover",
   },
   blueButton: {
+    width: "50%",
+    maxWidth: 400,
+    margin: theme.spacing(1),
     backgroundColor: "#178bf1",
     color: "#fff",
     "&:hover": {
       backgroundColor: "#0085fa",
     },
   },
-  redButton: {
-    backgroundColor: "#ff4081",
-    color: "#fff",
-    "&:hover": {
-      backgroundColor: "#f50057",
-    },
+  paginationContainer: {
+    display: "flex",
+    justifyContent: "center",
+    marginTop: theme.spacing(3),
   },
-  uploadButton: {
+  paginationButton: {
     margin: theme.spacing(1),
-    textTransform: "none",
-  },
-  submitButton: {
-    margin: theme.spacing(2, 0),
-    textTransform: "none",
   },
 }));
 
@@ -115,6 +117,7 @@ const RenderImages = () => {
   const INIT_FETCH = 10 * PER_PAGE;
 
   const [selectedCategory, setSelectedCategory] = useState("random");
+  const [prevCategory, setPrevCategory] = useState("random");
   const YOUR_SEARCH_QUERY = selectedCategory;
   const API_ENDPOINT_PEXEL = `https://api.pexels.com/v1/search?query=${YOUR_SEARCH_QUERY}&per_page=${INIT_FETCH}&page=${fetchedPage}`;
   const API_ENDPOINT_UNSPLASH = `https://api.unsplash.com/search/photos/?client_id=${API_KEY_UNSPLASH}`;
@@ -149,12 +152,14 @@ const RenderImages = () => {
             src: photo.urls,
           })
         );
-        const updatedPhotos = [
-          ...photos,
-          ...newPhotosPexel,
-          ...newPhotosUnsplash,
-        ];
-        dispatch(setPhotos(updatedPhotos));
+        let updatedPhotos = [];
+        if (YOUR_SEARCH_QUERY === prevCategory)
+          updatedPhotos = [...photos, ...newPhotosPexel, ...newPhotosUnsplash];
+        else {
+          updatedPhotos = [...newPhotosPexel, ...newPhotosUnsplash];
+          setPrevCategory(YOUR_SEARCH_QUERY);
+        }
+        if (updatedPhotos.length > 0) dispatch(setPhotos(updatedPhotos));
         const totalResults = updatedPhotos.length;
         const totalPages = Math.ceil(totalResults / PER_PAGE);
         setTotalPages(totalPages);
@@ -200,7 +205,7 @@ const RenderImages = () => {
 
   const handleCategoryChange = (event) => {
     const newCategory = event.target.value;
-    dispatch(setPhotos([]));
+    setChosenPhoto(null);
     setFetchedPage(1);
     setCurrentPage(1);
     setTotalPages(1);
@@ -241,6 +246,7 @@ const RenderImages = () => {
           variant="outlined"
           defaultValue={selectedCategory}
           onChange={debouncedHandleCategoryChange}
+          className={classes.searchInput}
         />
         <FormControl className={classes.select}>
           <InputLabel id="category-label">Our Suggestions</InputLabel>
@@ -270,15 +276,14 @@ const RenderImages = () => {
         </FormControl>
         <Loader
           loaded={!loading}
-          lines={13}
-          length={20}
-          width={10}
-          radius={30}
+          lines={30}
+          length={10}
+          width={3}
+          radius={50}
           color="#000"
         />
         {photos.length > 0 && (
           <>
-            <Typography variant="h5">Choose an image:</Typography>
             <div className={classes.mediaContainer}>
               {paginatedPhotos.map((photo) => (
                 <Card
@@ -300,32 +305,41 @@ const RenderImages = () => {
           </>
         )}
         {totalPages > 1 && (
-          <div>
+          <div className={classes.paginationContainer}>
             <Button
               disabled={currentPage === 1}
-              onClick={() => handlePageChange(currentPage - 1)}
+              onClick={() => {
+                handlePageChange(currentPage - 1);
+                setChosenPhoto(null);
+              }}
+              className={classes.paginationButton}
             >
               Previous
             </Button>
             <Button
               disabled={currentPage >= totalPages}
-              onClick={() => handlePageChange(currentPage + 1)}
+              onClick={() => {
+                handlePageChange(currentPage + 1);
+                setChosenPhoto(null);
+              }}
+              className={classes.paginationButton}
             >
               Next
             </Button>
           </div>
         )}
-        <Button
-          variant="contained"
-          className={classes.blueButton}
-          onClick={async () => {
-            await handlePhotoSelect(chosenPhoto);
-            navigate("/preview");
-          }}
-        >
-          Preview
-        </Button>
       </form>
+      <Button
+        variant="contained"
+        className={classes.blueButton}
+        onClick={async () => {
+          await handlePhotoSelect(chosenPhoto);
+          navigate("/preview");
+        }}
+        disabled={!chosenPhoto}
+      >
+        {chosenPhoto ? "Preview" : "Choose an image"}
+      </Button>
     </Container>
   );
 };
