@@ -1,4 +1,4 @@
-import { makeStyles } from "@material-ui/core";
+import { Card, CardMedia, makeStyles } from "@material-ui/core";
 import { Typography } from "@material-ui/core";
 import { Button, Container } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
@@ -77,6 +77,11 @@ const useStyles = makeStyles((theme) => ({
     margin: theme.spacing(2, 0),
     textTransform: "none",
   },
+  cardImage: {
+    width: "100%",
+    maxHeight: 500,
+    objectFit: "cover",
+  },
 }));
 
 const compressImage = (imageDataUrl, maxSizeInBytes) => {
@@ -146,33 +151,33 @@ const FinalPanel = () => {
   return (
     <Container className={classes.container}>
       <form className={classes.form}>
-        <Typography variant="h4" gutterBottom>
-          Final Image
-        </Typography>
         {finalPhoto && (
           <div>
-            <img
-              src={finalPhoto}
-              alt="FinalImage"
-              style={{ maxWidth: 600, maxHeight: 600 }}
-            />
+            <Card>
+              <CardMedia
+                component="img"
+                className={classes.cardImage}
+                src={finalPhoto}
+                alt={finalPhoto}
+              />
+            </Card>
           </div>
         )}
-        {/* <Button
+        <Button
           variant="contained"
           className={classes.redButton}
           onClick={handleDownload}
         >
           Download
-        </Button> */}
-        <Button
+        </Button>
+        {/* <Button
           variant="contained"
           color="primary"
           onClick={handleSave}
           className={classes.blueButton}
         >
           Save
-        </Button>
+        </Button> */}
       </form>
     </Container>
   );

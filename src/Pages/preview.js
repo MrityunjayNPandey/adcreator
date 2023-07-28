@@ -1,5 +1,11 @@
 import { makeStyles } from "@material-ui/core/styles";
-import { Container, Typography, Button } from "@material-ui/core";
+import {
+  Container,
+  Typography,
+  Button,
+  CardMedia,
+  Card,
+} from "@material-ui/core";
 
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -74,6 +80,11 @@ const useStyles = makeStyles((theme) => ({
     margin: theme.spacing(2, 0),
     textTransform: "none",
   },
+  cardImage: {
+    width: "100%",
+    maxHeight: 500,
+    objectFit: "cover",
+  },
 }));
 
 const Preview = () => {
@@ -95,19 +106,18 @@ const Preview = () => {
   return (
     <Container className={classes.container}>
       <form className={classes.form}>
-        <Typography variant="h4" gutterBottom>
-          Image Preview and Editing
-        </Typography>
         {selectedPhoto && (
           <div>
-            <img
-              src={selectedPhoto.src}
-              alt={selectedPhoto.id}
-              style={{ maxWidth: 500, maxHeight: 500 }}
-            />
+            <Card>
+              <CardMedia
+                component="img"
+                className={classes.cardImage}
+                src={selectedPhoto.src}
+                alt={selectedPhoto.id}
+              />
+            </Card>
           </div>
         )}
-
         <Button
           variant="contained"
           color="primary"
@@ -116,7 +126,6 @@ const Preview = () => {
         >
           Edit in Editor
         </Button>
-
         <Button
           variant="contained"
           color="primary"
