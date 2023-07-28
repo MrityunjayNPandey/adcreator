@@ -221,7 +221,7 @@ const RenderImages = () => {
     dispatch(
       setSelectedPhoto({
         ...args,
-        src: await getBase64FromImageUrl(src.large || src.full),
+        src: await getBase64FromImageUrl(src.original || src.raw),
       })
     );
     console.log(selectedPhoto);
