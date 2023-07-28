@@ -69,6 +69,11 @@ const useStyles = makeStyles((theme) => ({
       },
     },
   },
+  cardImage: {
+    width: "100%",
+    height: 150,
+    objectFit: "cover",
+  },
   blueButton: {
     backgroundColor: "#178bf1",
     color: "#fff",
@@ -285,6 +290,7 @@ const RenderImages = () => {
                 >
                   <CardMedia
                     component="img"
+                    className={classes.cardImage}
                     src={photo.src.medium || photo.src.regular}
                     alt={photo.id}
                   />

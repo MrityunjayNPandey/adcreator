@@ -53,11 +53,6 @@ const useStyles = makeStyles({
     backgroundColor: "rgba(0, 0, 0, 0.24)", 
     transition: "background-color 0.3s ease", 
   },
-
-  /**
-   * Applied to Orginal Card demo
-   * Same vale used in Material-ui Card Demos
-   */
   media: {
     height: 140,
   },
