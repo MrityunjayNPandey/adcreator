@@ -338,7 +338,7 @@ const RenderImages = () => {
         }}
         disabled={!chosenPhoto}
       >
-        {chosenPhoto ? "Preview" : "Choose an image"}
+        {chosenPhoto ? loading? "Image is getting ready..." : "Preview" : "Choose an image"}
       </Button>
     </Container>
   );
